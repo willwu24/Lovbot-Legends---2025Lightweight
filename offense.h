@@ -10,47 +10,13 @@
 #include "shooter.h"
 #include "display.h"
 #include "bluetooth.h"
-#include "offense.h"
 #include "grayscale.h"
 #include "goToBall.h"
 #include "defense.h"
 #include "player.h"
 
+// === Main Offense Control ===
 void offenseMain();
-
 void grabBall();
-void lightweightAimShoot();
-void lightweightCornerShoot();
-void lightweightPullAround();
-void whitePullAround();
-
-void cornerShoot();
-void goToCorner();
-// void aimShoot();
-void hideShoot();
-void hideShootRight();
-void hideShootLeft();
-
-void frontShoot();
-
-// void hideShootDistance();
-// void hideShootDistanceLeft();
-// void hideShootDistanceRight();
-
-// void hideShootFront();
-// void hideShootFrontLeft();
-// void hideShootFrontRight();
-
-
-// void hideSpin();
-// void hideSpinRight();
-// void hideSpinLeft();
-void backSpin();
-void backSpinWhite();
-// void backSpinSide();
-
-// void superteamStrategy();
-
-// void frontShoot();
 
 #endif
