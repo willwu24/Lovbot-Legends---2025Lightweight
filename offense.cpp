@@ -94,7 +94,6 @@ void offenseMain(){
     // whiteReached = true;
 
     // setLEDState(0, 1);
-    setParked(false);
     setMotorMode(0);
     resetBallPID();
     targetFlag = 0;
@@ -146,7 +145,6 @@ void offenseMain(){
     // setTarget(0);
     //setSpeed(currWhiteSpeed);
     
-    setParked(false);
     setMotorMode(0);
     resetBallPID();
     // setLEDState(0, 0);

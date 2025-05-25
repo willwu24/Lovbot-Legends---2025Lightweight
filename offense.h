@@ -2,21 +2,21 @@
 #define OFFENSE_H
 
 #include "func.h"
+<<<<<<< HEAD
 #include "distance.h"
+=======
+>>>>>>> 69cc2c2 (deleted unused files)
 #include "compass.h"
 #include "camera.h"
 #include "button.h"
 #include "led.h"
 #include "dribbler.h"
 #include "shooter.h"
-#include "backPosition.h"
-#include "followBall.h"
 #include "display.h"
 #include "bluetooth.h"
 #include "offense.h"
 #include "grayscale.h"
 #include "goToBall.h"
-#include "goToCoordinate.h"
 #include "defense.h"
 #include "player.h"
 

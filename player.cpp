@@ -1,5 +1,4 @@
 #include "player.h"
-#include "goToCoordinate.h"
 
 int kickoffTimer = 0;
 int tempKickoff = 0;
