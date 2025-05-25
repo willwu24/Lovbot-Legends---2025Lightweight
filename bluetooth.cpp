@@ -82,7 +82,17 @@ int receive() {
   }
   return -1;
 }
+// void sendBallStatus(){
+//   int ballDist = getBallDistance();
+//   int ballAngle = getBallAngle();
+//   int ballX = getX() + sin(toRadian(ballAngle))*ballDist + 128;
+//   int ballY = getY() + cos(toRadian(ballAngle))*ballDist + 128;
 
+//   changeSendArr(0,hasBall());
+//   changeSendArr(1,ballDetected());
+//   changeSendArr(2,ballX);
+//   changeSendArr(3,ballY);
+// }
 int getReceiveArr(int index) { return receiveArr[index]; }
 int getSendArr(int index) { return sendArr[index]; }
 void changeSendArr(int index, int data) { sendArr[index] = data; }

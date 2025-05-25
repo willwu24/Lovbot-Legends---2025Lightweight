@@ -1,9 +1,10 @@
 #include "defense.h"
 
-double MOVE_OFFSET = 15.0;
-int whiteTar = -1;
-int prevWhite = -1;
+double MOVE_OFFSET = 10.0;
+int whiteDir = -1;
+int prevWhiteDetected = -1;
 int lastGoalAngle = -1;
+int defenseSpeedOffset;
 
 unsigned long firstHasBall = -1;
 unsigned long firstBallFront = -1;
@@ -46,281 +47,124 @@ void setupDefense(){
 }
 
 void defenseMain(){
-  setMotorMode(0);
-  retrieveKicker();
-  //Set Variables
-  int whiteDir = getWhiteAngle();
-  setTarget(0);
-  setAngleThres(25);
-  // setTurningMode(1);
-  if (getAbsAngle(whiteDir-getHomeAngle())>getAbsAngle((whiteDir+180)%360-getHomeAngle())){
-    whiteTar = (whiteDir+getCompass())%360;
+  setAngleThres(20);
+  if(whiteDetected()){
+    whiteMove(getDefenseDir());
+    prevWhiteDetected = -1;
   }
   else{
-    whiteTar = (whiteDir+getCompass()+180)%360;
-  }
-  int ballDir = (getEyeAngle()-(whiteTar)+360)%360;//(getEyeAngle()-(getHomeAngle()-180)+360)%360;
-  //Serial.print(ballDir);
-  if(whiteDetected()&&homeDetected()){
-    prevWhite = whiteDir;
-  }
-  if(homeDetected()){
-    lastGoalAngle = getHomeAngle();
-  }
-  defBallDist = getEyeValue();
-  // Serial.print(whiteTar);
-  //Main code logic
-  setSpeed(30);
-  if(hasBall()){
-    //Serial.print("HAS BALL");
-    if(firstHasBall==-1){
-      firstHasBall = millis();
+    if(prevWhiteDetected==-1){
+      prevWhiteDetected=millis();
     }
-    if((millis()-firstHasBall>500||getUltraBack()>90)&&getUltraFront()>20){
-      kick();
-      resetVariables();
+    else if(millis()-prevWhiteDetected<1000){
+      setDir(whiteDir);
     }
     else{
-      setDir((getHomeAngle()+180)%360);
-      setSpeed(60);
+      setDir(180);
     }
   }
-  else if(gettingBall){
-    //Serial.print("GETTING BALL");
-    if(firstGettingBall==-1){
-      firstGettingBall = millis();
-    }
-    if(millis()-firstGettingBall>700||(getEyeAngle()>60&&getEyeAngle()<300)||(getUltraBack()>90)){//||getEyeValue()<180
-      firstGettingBall=false;
-      resetVariables();
-    }
-    // else{
-       goToBallPID();
-       setSpeed(60);
-    // }
-    if(whiteDetected()&&millis()-firstGettingBall>200){
-      setDir((getWhiteAngle() + 180) % 360);
-    }
-  }
-  else if(!whiteDetected()){//going back to white line
-    //Serial.print("RETURN TO WHITE");
-    resetVariables();
-    if(getUltraBack()<27){
-      if(homeDetected()&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle()>20)){//TUNE
-        // if(getEyeValue()<12||getEyeAngle()<20||getEyeAngle()>340){
-        //   setDir(0);
-        // }
-        // else if(getEyeAngle()<180){//ballRight
-        //   setDir(45);
-        // }
-        // else{
-        //   setDir(315);
-        // }
-        if(getEyeValue()<12||(getEyeAngle()>75&&getEyeAngle()<285)){
-          setDir(0);
-        }
-        else{
-          setDir(getEyeAngle());
-        }
-      }
-      else if(lastGoalAngle<180){
-        setDir(90);
-      }
-      else{
-        setDir(270);
-      }
-      // else if(prevWhite!=-1){
-      //   setDir(prevWhite);
-      // }
-    }
-    else{
-      if(homeDetected()){
-        setDir(getHomeAngle());
-      }
-      else if(lastGoalAngle<180){
-        setDir(90);
-      }
-      else{
-        setDir(270);
-      }
-      // else if(prevWhite!=-1){
-      //   setDir(prevWhite);
-      // }
-    }
-  }
-  else{
-    //Serial.print("ON WHITE");
-    if(!homeDetected()){
-      //Serial.print("in corner?");
-      // prevWhite==-1;
-      if(lastGoalAngle<180){
-        setDir(45);
-      }
-      else{
-        setDir(315);
-      }
-      if(abs(getAngleDif(180, getWhiteAngle()))>20&&abs(getAngleDif(0, getWhiteAngle()))>20){ 
-        //Serial.print("STUCK");
-        setDir(0);
-      }
-      //Serial.print(getWhiteAngle());
-    }
-    else if(getUltraBack()>37){//TUNE
-      setDir(getHomeAngle());
-    }
-    else if(getEyeValue() < 12){//no ball, go back to center?//TUNE, not that important tho!
-      resetVariables();
-      if(getYellowRightEdgeAngle()>140){
-        whiteMove(270);
-      }
-      else if(getYellowLeftEdgeAngle()<195){
-        whiteMove(90);
-      }
-      else{
-        whiteMove(360);
-      }
-      // if(getHomeAngle()>170&&getHomeAngle()<190){
-      //   if(getUltraBack()>25){
-      //     whiteMove(360);
-      //   }
-      //   else if(whiteTar>180){
-      //     whiteMove(90);
-      //   }
-      //   else{
-      //     whiteMove(270);
-      //   }
-      // }
-      // else if(getHomeAngle()<180){
-      //   whiteMove(90);
-      // }
-      // else{
-      //   whiteMove(270);
-      // }
-    }
-    else{ //goToBall
-      setMotorMode(1);
-      defBallAngle = min(abs(getAngleDif(ballDir,0)),abs(getAngleDif(ballDir,180)));
-      // Serial.print(defBallAngle);
-      // Serial.print(" ");
-      if(getUltraBack()<40&&(abs(getAngleDif(0,whiteTar))>40&&abs(getAngleDif(180,whiteTar))>40)){//reaching end of penalty white line, go back//(abs(getAngleDif(whiteTar,90))<20||abs(getAngleDif(whiteTar,270))<20)
-        setMotorMode(0);
-        //Serial.print("moving back");
-        resetVariables();
-        //Serial.print(lastGoalAngle);
-        if(lastGoalAngle!=-1){
-          if(lastGoalAngle<180){
-            whiteMove(90);
-          }
-          else{
-            whiteMove(270);
-          }
-        }
-        else{
-          setDir(0);
-        }
-        if(getHomeAngle()<180){
-          if(getEyeAngle()>=160&&getEyeAngle()<340){
-            setDir(360);
-          }
-          else{
-            whiteMove(90);
-          }
-        }
-        else{
-          if(getEyeAngle()<=200&&getEyeAngle()>30){
-            setDir(360);
-          }
-          else{
-            whiteMove(270);
-          }
-        }
-        if(getUltraBack()<15){
-          setDir(0);
-        }
-      }
-      else if(ballDir<15||ballDir>345||(ballDir<200&&ballDir>160)){//ball in front or ball behind
-        if(getEyeValue()<180||(getEyeAngle()>=20&&getEyeAngle()<=340)){
-          resetVariables();
-        }
-        else{
-          if(firstBallFront==-1){
-            firstBallFront=millis();
-          }
-          else if(millis()-firstBallFront>3000){
-            gettingBall = true;
-          }
-        }
-        whiteMove(360);
-      }
-      else if(ballDir<180){//ball left
-        resetVariables();
-        whiteMove(90);
-      }
-      else{//ball right
-        resetVariables();
-        whiteMove(270);
-      }
-      // distPID.Compute();
-      anglePID.Compute();
-      // Serial.print(angleSpeedRatio);
-      double addition =(defenseSpeedDiff*angleSpeedRatio)/100;//(defenseSpeedDiff * distSpeedRatio) / 100+
-      double finalSpeed = addition + minDefenseSpeed;
-      if(abs(getAngleDif(0,whiteTar))>15){
-        //Serial.print("SLOWDOWN");
-        finalSpeed = finalSpeed*0.75;
-      }
-      if(getEyeAngle()>90&&getEyeAngle()<270){
-        finalSpeed = finalSpeed*0.65;
-      }
-      // finalSpeed = finalSpeed-abs(getAngleDif(180,getHomeAngle()))*0.25;
-      setSpeed(finalSpeed);
-    }
-  }
+
+  setSpeed(10+defenseSpeedOffset);
+
 }
 
 
 void whiteMove(int dir){
-  //behind white line: 0, magnitue negative
-  //in front of white line: 180, mangitude positive
-  double magnitude = abs(getMagnitude());
-  int goalAngle = (getHomeAngle()+getCompass())%360;
-  if(getRawWhiteAngle()<90||getRawWhiteAngle()>270){
-    // Serial.print("Changing");
+  double magnitude = getMagnitude();
+  magnitude = constrain(magnitude, -1.0, 1.0);
+
+  if (abs(getAngleDif(getRawWhiteAngle(),getHomeAngle()))>abs(getAngleDif((getRawWhiteAngle()+180)%360,getHomeAngle()))){
     magnitude = abs(magnitude)*-1;
   }
-  // Serial.print(getRawWhiteAngle());
-  // Serial.print(" ");
-  // Serial.print(getMagnitude());
-  // Serial.print(" ");
-  // Serial.print(magnitude);
-  // Serial.print(" ");
-  setDir((dir+whiteTar)%360);
-  if(dir==STOP){
-    setDir(STOP);
+  else
+  {
+    magnitude = abs(magnitude);
+  }
+  double offset = 0;
+  if (dir != 360)
+  {
+    int offsetSpeed = constrain(defenseSpeedOffset,10,50);
+    offset = magnitude* 35.0;
+  }
+
+  if (dir > 180){
+    offset *=-1;
+  }
+
+  double finalAngle = dir + offset;
+
+  setDir(finalAngle);
+
+
+
+
+
+
+  Serial.print(getDefenseDir());
+  Serial.print(" ");
+  Serial.print(magnitude);
+  Serial.print(" ");
+  Serial.print(getWhiteAngle());
+  Serial.print(" ");
+  Serial.print(getHomeAngle());
+  Serial.print(" ");
+  Serial.print(getEyeAngle());
+  Serial.print(" ");
+  Serial.println(finalAngle);
+}
+
+int getDefenseDir(){
+  int defenseDir = 0;
+  double magnitude = getMagnitude();
+  magnitude = constrain(magnitude, -1.0, 1.0);
+
+  whiteDir = getRawWhiteAngle();
+  if(abs(getAngleDif(whiteDir,getHomeAngle()))>abs(getAngleDif((whiteDir+180)%360,getHomeAngle()))){
+    whiteDir=(whiteDir+180)%360;
+  }
+  int moveAngle = 0;
+  if (getEyeAngle()>180){
+    moveAngle = 90;
   }
   else{
-    int dir = getDir();
-    //Serial.print(dir);
-    if(abs(magnitude)<0.10){
-      setDir(dir);
-    }
-    else{
-      int offset = magnitude*MOVE_OFFSET;
-      if(abs(getAngleDif(0,whiteTar))>15){
-        offset=offset*2;
-      }
-      // Serial.print(offset);
-      // Serial.print(" ");
-      if(dir>180){
-        offset*=-1;
-      }
-      setDir(dir+offset);
-    }
+    moveAngle = 270;
   }
-  if(!whiteDetected()){
-    setDir(dir);
+  defenseDir = (whiteDir+moveAngle)%360;
+
+  double cornerRatio = 1-abs(getAngleDif(whiteDir, 180))/45.0;
+  cornerRatio = constrain(cornerRatio, 0.05,1.0);
+
+  if ((getEyeAngle() > 180 && whiteDir > 190) || (getEyeAngle() < 180 && whiteDir < 170)){
+    cornerRatio = 1.0;
   }
+
+  double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;
+  angleRatio = constrain(angleRatio, 0.0,1.0);
+
+  defenseSpeedOffset = cornerRatio*angleRatio*60;
+
+  Serial.print("whiteDir:");
+  Serial.print(whiteDir);
+  Serial.print(" ");
+  Serial.print("corner:");
+  Serial.print(cornerRatio);
+  Serial.print(" ");
+  Serial.print("angle:");
+  Serial.print(angleRatio);
+  Serial.print(" ");
+  Serial.print("defenseOffset:");
+  Serial.print(defenseSpeedOffset);
+  Serial.print(" ");
+
+  if ((whiteDir < 155 && getEyeAngle() > 180) || (whiteDir > 205 && getEyeAngle() < 180)){
+    defenseDir = (defenseDir+180)%360;
+  }
+
+
+  return defenseDir;
 }
+
+
 
 void resetVariables(){
   firstHasBall = -1;

@@ -3,12 +3,16 @@
 
 #include <Arduino.h>
 #include "func.h"
+#include "distance.h"
+#include "flyeye.h"
 #include "compass.h"
 #include "camera.h"
 #include "button.h"
 #include "led.h"
 #include "dribbler.h"
 #include "shooter.h"
+#include "backPosition.h"
+#include "followBall.h"
 #include "display.h"
 #include "bluetooth.h"
 #include "offense.h"
@@ -19,7 +23,6 @@
 #include "coordinate.h"
 #include "coordinateMovement.h"
 #include "config.h"
-#include "Odo.h"
 
 void player();
 

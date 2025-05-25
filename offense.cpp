@@ -1,15 +1,47 @@
 #include "offense.h"
 
+int reached = 0;
+int lastReached = 0;
+
+int leftright = 0;
+int checkDir = 0;
 int lastWhite = 0;
+int lastAntiDefenseWhite = 0;
 int wasWhite = 0;
 int currWhiteSpeed = 0;
 
+int randomAround = 0;
+//int transmitData = 0;
 int lastWhiteAngle;
-int minWhiteSpeed = 60;//maybe useful
-int maxWhiteSpeed = 80;//unused but maybe useful
+int lastAntiDefenseWhiteAngle;
+int targetSet = 0;
+int firstWhiteFlag = 0;
+int targetSetTime = 0;
+int minWhiteSpeed = 60;
+int maxWhiteSpeed = 80;
 int lastTarget = 0;
 
-int firstBall = 0;//not sure
+int fieldPosition = 0;
+
+int decideOffense = 0;
+
+bool leftWhiteReached = false;
+bool rightWhiteReached = false;
+bool backWhiteReached = false;
+bool whiteReached = false;
+bool runningAntiDefense = false;
+
+int lastOffenseSet = 0;
+int targetFlag = 0;
+int checkPointTime = 0;
+
+int cornerArrived = 0;
+
+int lastFrontReached = 0;
+
+int hasKick = 0;
+int lastLaserTime = 0;
+int firstBall = 0;
 
 unsigned long lastHasBall = -1;
 
@@ -18,60 +50,85 @@ unsigned long lastHasBall = -1;
 void offenseMain(){
   // Serial.println(getTarget());
   retrieveKicker();
+  // Serial.println(leftright);
+  int hasBallSpeedOffset;
   setTarget(0);
+  setLEDState(1,0);
 
   setTurningMode(0);
-
-  int tempOdoX;
-  //odo reset code, not used right now
-  
-  // if(getXBlocked()==0){
-  //   if(getUltraRight()<getUltraLeft()){
-  //     tempOdoX = (80-min(getUltraRight(),80));
-  //   }
-  //   else{
-  //     tempOdoX = (80-min(getUltraLeft(),80))*-1;
-  //   }
-  //   setOdoShiftX(tempOdoX);
-  //   Serial.print("tempOdo: ");
-  //   Serial.print(tempOdoX);
-  // }
   // setTurnSpeed(20);
 
+  // if (getOpposingDistance() > 80 && !hasBall() && homeDetected() && getEyeValue() > 15 && whiteDetected() && getHomeAngle() < 215 && getHomeAngle() > 145 && getHomeDistance() < 70 && millis()-getLastRoleSwitch() > 2000){
+  //   setRobotRole(DEFENSE);
+  // }
 
+  // if (opposingDetected() && (!whiteDetected())){
+  //   int offenseTarget;
+  //   offenseTarget = (getOpposingAngle()+getCompass())%360;
+  //   if (offenseTarget < 40 || offenseTarget > 320)
+  //   {
+  //     targetSet = millis();
+  //     setTarget(offenseTarget);
+  //   }
+  // }
+  // else if (!whiteDetected() && millis() - targetSet > 500)
+  // {
+  //   setTarget(0);
+  // }
   setTarget(0);
 
 
 
   if(whiteDetected() && firstBall != 1){
-    Serial.println("Running White Line");
+    if(wasWhite==0){
+      wasWhite = 1;
+      currWhiteSpeed = getSpeed()*1.30;
+    }
+    ///currWhiteSpeed = constrain(currWhiteSpeed, 50, 90);
+    //setSpeed(currWhiteSpeed);
+    setSpeed(40);
+    //Serial.println("Running White Line");
+    // setAngleThres(90);
+    // setTurningMode(1);
+    // setTurnSpeed(7);
+    // whiteReached = true;
+
+    // setLEDState(0, 1);
+    setParked(false);
     setMotorMode(0);
     resetBallPID();
+    targetFlag = 0;
     int dirAngle = (getWhiteAngle() + 180) % 360;
+    if (dirAngle > 80 && dirAngle < 100)
+    {
+      leftWhiteReached = true;
+    }
+    else if (dirAngle > 260 && dirAngle < 280)
+    {
+      rightWhiteReached = true;
+    }
 
     lastWhite = millis();
     lastWhiteAngle = (getWhiteAngle() + 180) % 360;
-    //following white line in home goal code
+    if(0){//((getHomeDistance()<60&&homeDetected()&&!getFlip())||(getUltraFront()>40&&getUltraBack()<35&&getUltraRight()<45&&getUltraRight()>30&&getEyeAngle()>180)||(getUltraFront()>40&&getUltraBack()<35&&getUltraLeft()<45&&getUltraLeft()>30&&getEyeAngle()<180)){
+      //Serial.print("tangent");
+      setLEDState(1,1);
+      if(getEyeAngle()<180){
+        setDir((80+getWhiteAngle() + 180)%360);
+      }
+      else{
+        setDir((280+getWhiteAngle() + 180)%360);
+      }
+    }
+    else if(0){//(getInCorner()&&!getFlip()){
+      cornerPark();
+    }
+    else{
+      setLEDState(1,0);
+      setDir((getWhiteAngle() + 180) % 360);
+    }
 
-    // if(0){//((getHomeDistance()<60&&homeDetected()&&!getFlip())||(getUltraFront()>40&&getUltraBack()<35&&getUltraRight()<45&&getUltraRight()>30&&getEyeAngle()>180)||(getUltraFront()>40&&getUltraBack()<35&&getUltraLeft()<45&&getUltraLeft()>30&&getEyeAngle()<180)){
-    //   //Serial.print("tangent");
-    //   setLEDState(1,1);
-    //   if(getEyeAngle()<180){
-    //     setDir((80+getWhiteAngle() + 180)%360);
-    //   }
-    //   else{
-    //     setDir((280+getWhiteAngle() + 180)%360);
-    //   }
-    // }
-    // else if(0){//(getInCorner()&&!getFlip()){
-    //   cornerPark();
-    // }
-    // else{
-    setDir((getWhiteAngle() + 180) % 360);
-    // }
-
-    //different speed controls
-
+    double magnitude = getMagnitude();
     //setSpeed(minWhiteSpeed+(maxWhiteSpeed-minWhiteSpeed)*(1-magnitude)*0.5);
     // if (!getFlip()) 
     // {
@@ -80,44 +137,35 @@ void offenseMain(){
     // {
     //   setSpeed(30);
     // }
-    // setCenter();
-    // moveToCoordinate();
-    // setSpeed(40);
-        // if(wasWhite==0){
-    //   wasWhite = 1;
-    //   currWhiteSpeed = getSpeed()*1.30;
-    // }
-    ///currWhiteSpeed = constrain(currWhiteSpeed, 50, 90);
-    //setSpeed(currWhiteSpeed);
-    setSpeed(50);
   }
-  else if (((millis() - lastWhite < 100 && !getFlip()))|| (millis() - lastWhite < 1000 && getFlip())) //|| (millis() - lastWhite < 1000 && getFlip())) && firstBall != 1) 
+  else if (((millis() - lastWhite < 150 && !getFlip()))|| (millis() - lastWhite < 2000 && getFlip())) //|| (millis() - lastWhite < 1000 && getFlip())) && firstBall != 1) 
   {
-    Serial.println("Running White Line 50ms");
+    //Serial.println("Running White Line 50ms");
+    // setTurningMode(1);
+    // reached = 0;
+    // setTarget(0);
+    //setSpeed(currWhiteSpeed);
     
+    setParked(false);
     setMotorMode(0);
     resetBallPID();
-
-    //code for following white line in home goal
-
-    // if(0){//((getHomeDistance()<60&&homeDetected()&&!getFlip())||(getUltraFront()>40&&getUltraBack()<35&&getUltraRight()<45&&getUltraRight()>40&&getEyeAngle()>180)||(getUltraFront()>40&&getUltraBack()<35&&getUltraLeft()<45&&getUltraLeft()>40&&getEyeAngle()<180)){
-    //   setLEDState(1,1);
-    //   if(getEyeAngle()<180){
-    //     setDir((80+lastWhiteAngle + 180)%360);
-    //   }
-    //   else{
-    //     setDir((280+lastWhiteAngle + 180)%360);
-    //   }
-    // }
-    // else if(0){//(getInCorner()&&!getFlip()){
-    //   cornerPark();
-    // }
-    // else{
+    // setLEDState(0, 0);
+    if(0){//((getHomeDistance()<60&&homeDetected()&&!getFlip())||(getUltraFront()>40&&getUltraBack()<35&&getUltraRight()<45&&getUltraRight()>40&&getEyeAngle()>180)||(getUltraFront()>40&&getUltraBack()<35&&getUltraLeft()<45&&getUltraLeft()>40&&getEyeAngle()<180)){
+      setLEDState(1,1);
+      if(getEyeAngle()<180){
+        setDir((80+lastWhiteAngle + 180)%360);
+      }
+      else{
+        setDir((280+lastWhiteAngle + 180)%360);
+      }
+    }
+    else if(0){//(getInCorner()&&!getFlip()){
+      cornerPark();
+    }
+    else{
       setLEDState(1,0);
       setDir((lastWhiteAngle) % 360);
-    //}
-
-    //different speed controls
+    }
 
     // if (!getFlip()) 
     // {
@@ -128,14 +176,16 @@ void offenseMain(){
     // }
     // setSpeed(25);
     //setSpeed(minWhiteSpeed);
-    setSpeed(50);
-    //setSpeed(currWhiteSpeed);
   }
   else
   {
-    //wasWhite = 0; used for white line speed control
+    wasWhite = 0;
     setMotorMode(0);
-    if (hasBall()){
+    int m = hasBall();
+    // Serial.print(analogRead(LAZER_PIN));
+    // Serial.print(" ");
+    //Serial.print(m);
+    if (hasBall()){ //&& getEyeValue() > 150 && (getEyeAngle() < 100 || getEyeAngle() > 260)
       //Serial.print("Has ball");
       setTurningMode(0);
       // if (opposingDetected() && (!whiteDetected())){
@@ -173,18 +223,15 @@ void offenseMain(){
       // if(lastHasBall ==-1){
       //   lastHasBall = millis();
       // }
-      if(millis()-lastHasBall>100){
-        Serial.print("KICK!");
-        kick();
-      }
-
-
-      if(getUltraFront()<25){
-        // setSpeed(70);
-        grabBall();
-      }
-      // else{
+      // if(millis()-lastHasBall>100){
+      //   Serial.print("KICK!");
       //   kick();
+      // }
+
+
+      // if(getUltraFront()<25){
+      //   // setSpeed(70);
+      //   grabBall();
       // }
       // grabBall();
       // setTarget(lastTarget);
@@ -206,13 +253,8 @@ void offenseMain(){
       //     kick();
       //   }
       // }
-      //kick();
-      if(getY()>35){
-        setSpeed(30);
-      }
-      else{
-        setSpeed(50);
-      }
+      kick();
+      setSpeed(50);
     }
     else if (receive()==1){
         //Serial.print("Other robot has ball");
@@ -223,6 +265,10 @@ void offenseMain(){
     else if (getEyeValue() < 12){
       lastHasBall = -1;
       setMotorMode(0);
+      runningAntiDefense = false;
+      whiteReached = false;
+      reached = 0;
+      hasKick = 0;
       firstBall = 0;
       setTurningMode(0);
       // setTarget(0);
@@ -231,37 +277,72 @@ void offenseMain(){
       setCenter();
       //moveToCoordinate();
       setDir(STOP);
+
+      // if (opposingDetected()){
+      //   // int offenseTarget = (getOpposingAngle()+getCompass())%360;
+      //   if (getCompass() < 6 || getCompass() > 354){
+      //     if (getOpposingDistance() > 80 && getOpposingDistance() < 86){
+      //       setDir(STOP);
+      //     }
+      //     else
+      //     {
+      //       if (getOpposingDistance() > 83){
+      //         setDir(0);
+      //         setSpeed(18);
+      //       }
+      //       else
+      //       {
+      //         setDir(180);
+      //         setSpeed(18);
+      //       }
+      //     }
+      //   }
+      //   else{
+      //     setTarget(0);
+      //     if (getCompass() > 180){
+      //       setDir(270);
+      //       int backPositionSpeed = (359-getCompass())/1.6;
+      //       backPositionSpeed = constrain(backPositionSpeed, 12, 30);
+      //       setSpeed(backPositionSpeed);
+      //     }
+      //     else
+      //     {
+      //       setDir(90);
+      //       int backPositionSpeed = getCompass()/1.6;
+      //       backPositionSpeed = constrain(backPositionSpeed, 12, 30);
+      //       setSpeed(backPositionSpeed);
+      //     }
+      //   }
+      // }
+      // else
+      // {
+      //   // setTarget(0);
+      //   setDir(STOP);
+      // }
     }
     else{
       lastHasBall = -1;
       //Serial.print("GO TO BALL");
-      setMotorMode(0);
+      setMotorMode(1);
+      runningAntiDefense = false;
+      whiteReached = false;
+      reached = 0;
+      hasKick = 0;
       firstBall = 0;
       // setTarget(0);
       setTurningMode(0);
 
       goToBallPID();
-      setSpeed(40);
       //Serial.print(getAbsAngle(getEyeAngle()-(lastWhiteAngle+180)%360));
-      // if(millis() - lastWhite < 500&&((getAbsAngle(getEyeAngle()-(lastWhiteAngle+180)%360)<50&&!getFlip())||(getAbsAngle(getEyeAngle()-(lastWhiteAngle+180)%360)<60&&getAbsAngle(getEyeAngle()-180)<60))){
-      //   //Serial.print("SLOWDOWN");
-      //   setSpeed(20);
-      // }
-      // if((getEyeAngle() > 10 && getEyeAngle() < 170 && getX() > 0) || (getEyeAngle() < 350 && getEyeAngle() > 190 && getX() < 0)){
-      //   setSpeed(40-abs(getX())*1);
-      // }
-      // else
-      // {
-      //   setSpeed(40);
-      // }
-      // if(abs(getX())>35||abs(getY())>35){
-      //   setSpeed(10);
-      // }
+      if(millis() - lastWhite < 500&&((getAbsAngle(getEyeAngle()-(lastWhiteAngle+180)%360)<50&&!getFlip())||(getAbsAngle(getEyeAngle()-(lastWhiteAngle+180)%360)<60&&getAbsAngle(getEyeAngle()-180)<60))){
+        //Serial.print("SLOWDOWN");
+        setSpeed(20);
+      }
+      setSpeed(30);
       // if(getInCorner()){
       //   cornerPark();
       // }
       // if(getUltraBack()<20&&getUltraRight()<20)
-      updateWall();
     } 
   }
   // Serial.print(getDir());
@@ -298,62 +379,6 @@ void offenseMain(){
   //....ddddddddddddddd....ooooooooooo.....nnnnnn....nnnnnn....eeeeeeeeeee....
   //......dddddd.............ooooooo.............................eeeeeee......
   //..........................................................................
-
-void updateWall(){
-  double dir = getDir();
-  Serial.print(" Dir:");
-  Serial.print(dir);
-  double speed = getSpeed();
-  double vector = (360.0-dir+90.0)*3.14159265/180.0; 
-  double x = max(0.0,speed)*cos(vector);
-  double y = max(0.0,speed)*sin(vector);
-  double adjX=x;
-  double adjY=y;
-  double scaleX = (40.0-abs(getX()))/20.0;
-  double scaleY = (40.0-abs(getY()))/20.0;
-  // if(abs(getX())<30){
-  //   adjX=x*min(1.0,scale);
-  // }
-  if((getX()>0&& getEyeAngle() > 0 && getEyeAngle() < 180) || (getX()<0 && getEyeAngle() < 360 && getEyeAngle() > 180)){
-    adjX=x*scaleX;
-    Serial.print("adjust X");
-  }
-  if((getY()<0 && getEyeAngle() < 270 && getEyeAngle() > 90) || (getY()>0 && (getEyeAngle() > 270 || getEyeAngle() < 90))){
-    Serial.print("adjust Y");
-    adjY=y*scaleY;
-  }
-  
-  double adjustedSpeed = sqrt(adjX*adjX+adjY*adjY);
-  double adjustedAngle = (atan2(adjY,adjX));
-  adjustedAngle = fmod((450-adjustedAngle * 180.0/3.14159265),360.0);
-  if(adjustedAngle<0){ 
-    adjustedAngle+=360.0;
-  }
-  if(adjustedAngle>=360){
-    adjustedAngle-= 360.0;
-  }
-  Serial.print(" xVector:");
-  Serial.print(x);
-  Serial.print(" yVector:");
-  Serial.print(y);
-  Serial.print(" scaleX:");
-  Serial.print(scaleX);
-  Serial.print(" scaleY:");
-  Serial.print(scaleY);
-  Serial.print(" adjustedSpeed:");
-  Serial.print(adjustedSpeed);
-  Serial.print(" adjustedAngle");
-  Serial.println(adjustedAngle);
-  if(abs(getX())>20||abs(getY())>20)
-  {
-      setDir(adjustedAngle);
-      setSpeed(adjustedSpeed*0.75);
-  }
-
-  // wallDistX = 55-getX();
-}
-
-
 void grabBall(){
   while(hasBall() && getCompass()<45&&!whiteDetected()){
     if(getUltraLeft()>getUltraRight()){ //motor values might be wrong... negatives :( 

@@ -3,8 +3,8 @@
 
 //variable declearation
 
-double motorCorrectionKp=0.50, motorCorrectionKi=0.00, motorCorrectionKd=0.00;
-double motorTurningKp=0.15, motorTurningKi=0.00, motorTurningKd=0.00;
+double motorCorrectionKp=0.12, motorCorrectionKi=0.00, motorCorrectionKd=0.00;
+double motorTurningKp=0.11, motorTurningKi=0.00, motorTurningKd=0.00;
 // double motorKp=0.21, motorKi=0.00, motorKd=0.012;
 double motorSetpoint, motorInput, motorCorrectionOutput, motorTurningOutput;
 
@@ -448,17 +448,27 @@ void setKicker(int state){
 }
 
 bool getLaser(){
+  //if(digitalRead(DRIB_SWITCH_PIN)) lastSwitchOnTime=millis();
+  //if(0) lastSwitchOnTime=millis();
+  //return millis()-lastSwitchOnTime<switchOffReactionTime;
   int analogReading = analogRead(LAZER_PIN);
+  // Serial.print(analogReading);
+  // Serial.print(" - ");
+  // Serial.print(" ");
+  // Serial.print(analogReading);
+  // Serial.print(" ");
   return analogReading < 3;
 }
 
 bool hasBall() {
-  if(getLaser()==true&&(getEyeAngle()<40||getEyeAngle()>320)){//laser detects true and ball in front
+  // return false;
+  // return getLaser();
+  if(getLaser()==true&&(getEyeAngle()<40||getEyeAngle()>320)){
     laserCounter+=1;
-    if(getBotNum()==1){//bot 1, laser not as sensitive
+    if(getBotNum()==1){
       return true;
     }
-    else if(laserCounter>5){//bot 0, laser sometimes gives false positive, need to filter
+    if(laserCounter>5){
       // laserCounter = -1;
       return true;
     }
@@ -470,6 +480,34 @@ bool hasBall() {
     laserCounter = -1;
     return false;
   }
+  // long m = millis();
+  // if (getLaser() == true&&(getEyeAngle()<40||getEyeAngle()>320)) {//&&getEyeValue()<250&&getEyeValue()>120    &&(getEyeAngle()<40||getEyeAngle()>320)
+  //   lastLaser=m;
+  //   //return true; //temporary
+  //   if(!laserSensed){
+  //     laserSensed=true;
+  //     laserTimer=m;
+  //     return false;
+  //   }
+  //   else{
+  //     if(m-laserTimer<10){
+  //       return false;
+  //     }
+  //     else{
+  //       lastLaser=m;
+  //       return true;
+  //     }
+  //   }
+  // }
+  // else {
+  //   if (millis() - lastLaser < 100) {//
+  //     return true;
+  //   }
+  //   else {
+  //     laserSensed=false;
+  //     return false;
+  //   }
+  // }
 }
 
 //----------------------------------------------------------------Timer

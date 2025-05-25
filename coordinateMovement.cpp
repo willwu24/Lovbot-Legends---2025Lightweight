@@ -5,7 +5,7 @@ int minSpeed = 20;
 int maxSpeed = 40;
 
 // Parking flag:
-int parkThresholdDist = 0;//20
+int parkThresholdDist = 10;//20
 int parkThresholdTime = 200;
 bool parking = false;
 unsigned long confirmParkTime = -1;

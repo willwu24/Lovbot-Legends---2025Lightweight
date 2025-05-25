@@ -2,17 +2,22 @@
 #define OFFENSE_H
 
 #include "func.h"
+#include "distance.h"
+#include "flyeye.h"
 #include "compass.h"
 #include "camera.h"
 #include "button.h"
 #include "led.h"
 #include "dribbler.h"
 #include "shooter.h"
+#include "backPosition.h"
+#include "followBall.h"
 #include "display.h"
 #include "bluetooth.h"
 #include "offense.h"
 #include "grayscale.h"
 #include "goToBall.h"
+#include "goToCoordinate.h"
 #include "defense.h"
 #include "player.h"
 
@@ -32,8 +37,6 @@ void hideShootRight();
 void hideShootLeft();
 
 void frontShoot();
-
-void updateWall();
 
 // void hideShootDistance();
 // void hideShootDistanceLeft();

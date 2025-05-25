@@ -45,6 +45,14 @@ void clearLEDState(){
 }
 
 void checkLED(){
+  // if (getFlip())
+  // {
+  //   setLEDState(1,1);
+  // }
+  // else
+  // {
+  //   setLEDState(1,0);
+  // }
 
   if (getKickoff()){
     setLEDState(4,1);

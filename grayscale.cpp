@@ -394,7 +394,7 @@ void processWhiteAngle(){
     if(firstFlip){
       firstFlip = false;
     }
-    else if (whiteDetected() && abs(getLightDif(lastAngle, rawAngle)) > 100)
+    else if (whiteDetected() && abs(getLightDif(lastAngle, rawAngle)) > 120)
     {
       flip = !flip;
       lastWhiteTime = millis();

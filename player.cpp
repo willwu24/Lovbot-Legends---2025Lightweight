@@ -1,4 +1,5 @@
 #include "player.h"
+#include "goToCoordinate.h"
 
 int kickoffTimer = 0;
 int tempKickoff = 0;
@@ -54,9 +55,8 @@ void player() {
   //Set which goal you are shooting on
   setAttackMode(YELLOW);
   //Set offense or defense;
-  setRobotRole(OFFENSE);
+  setRobotRole(DEFENSE);
   setupVariables();
-  
   // while(1){
   //   setMotors(20,20,20,20);
   //   //setMotor(4, 20);
@@ -70,7 +70,6 @@ void player() {
     processWhiteAngle();
     processDFUltraTrig();
     getCoordinate();
-    odoUpdate();
     // printSensorsReading();
     setLED();
     //Change Button Logic
@@ -86,20 +85,35 @@ void player() {
     if (getRobotRole() == OFFENSE) {
       //Serial.print("OFFENSE");
       offenseMain();
+      //moveToCoordinate();
+      // Serial.println(getYellowAngle());
     }
     //DEFENSE
     else {
       defenseMain();
     }
-    displayDistance();
-    displayCoordinate();
-    Serial.print("dir: ");
-    Serial.print(getDir());
-    Serial.print("getEyeAngle: ");
-    Serial.print(getEyeAngle());
+    // printSensorsReading();
+    // //printSensorsThres();
+    // printSensorsWhite();
+    //transmit(1);
+    // setTarget(0);
+    //displayDistance();
+    //displayCamera();
+    //Serial.print(getAngleDif(180, getWhiteAngle()));
+    // Serial.print(getDir());
+    // Serial.print(" ");
+    // Serial.print(getRawWhiteAngle());
+    // Serial.print(" ");
+    // Serial.print(getWhiteAngle());
+    // Serial.print(" ");
+    // Serial.print(getCompass());
     Serial.print(" ");
-    printOdo();
+    Serial.print(analogRead(EYE_PORT_PIN));
+    Serial.print(" ");
+    Serial.print(getEyeAngle());
     Serial.println();
     move();
+    //setMotors(10,10,10,10);
+    // Serial.println(hasBall());
   }
 }

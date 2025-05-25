@@ -26,7 +26,7 @@
 #include "DFUltraTrig.h"
 
 // #define TURNING_SPEED 7
-#define MOVE_CORRECTION_RATIO 0.3
+#define MOVE_CORRECTION_RATIO 0.5
 
 #define OFF 0
 #define ON 1
@@ -67,8 +67,8 @@
 
 
 //#define H_SIZE 160 //old robot
-#define H_SIZE 140//160 //new robot
-#define V_SIZE 190//180//210
+#define H_SIZE 171 //new robot
+#define V_SIZE 232//210
 
 struct posInfo { int posX; int posY; bool isXBlocked; bool isYBlocked; long timestamp; };
 struct posData { int posX; int posY; unsigned long timeX; unsigned long timeY; };
@@ -79,8 +79,8 @@ static posInfo currPosition;
 
 
 
-const int toleranceH = 5;
-const int toleranceV = 5;//40
+const int toleranceH = 100;
+const int toleranceV = 120;//40
 const int thresHoldh = H_SIZE-toleranceH; 
 const int thresHoldv = V_SIZE-toleranceV; 
 

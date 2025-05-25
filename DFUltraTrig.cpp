@@ -4,15 +4,8 @@
 #define    VELOCITY_TEMP(temp)       ( ( 331.5 + 0.6 * (float)( temp ) ) * 100 / 1000000.0 ) // The ultrasonic velocity (cm/us) compensated by temperature
 
 #define ULTRA_NUM 4
-#define HISTORY_SIZE 10
-
-
-int lastReadings[ULTRA_NUM][HISTORY_SIZE] = {0};  // 2D array to store last 5 readings per sensor
-int readingIndex[ULTRA_NUM] = {0};                // Keep track of insertion point for each sensor
-
 
 int trigechoPin[ULTRA_NUM] = {A9, A13, A8, A12};//A14 for front
-// int lastLeftReadings[5] = {0,0,0,0,0};
 uint16_t distance;
 uint32_t pulseWidthUs;
 
@@ -40,27 +33,27 @@ void processDFUltraTrig(){
       distance = pulseWidthUs * VELOCITY_TEMP(20) / 2.0;//The distance can be calculated according to the flight time of ultrasonic wave,/
                                                          //and the ultrasonic sound speed can be compensated according to the actual ambient temperature
       ultraReadings[ultraCount] = distance;
-      lastReadings[ultraCount][readingIndex[ultraCount]] = distance;
-      readingIndex[ultraCount] = (readingIndex[ultraCount] + 1) % HISTORY_SIZE;
-      int maxVal = 0;
-
+      // if(getBotNum()==0&&ultraCount==0){//TEMPORARY
+      //   ultraReadings[0]= 1000;
+      // }
+      // Serial.print(ultraReadings[0]);
+      // Serial.print("   ||  ");
+      // Serial.print(ultraReadings[1]);
+      // Serial.print("   ||  ");
+      // Serial.print(ultraReadings[2]);
+      // Serial.print("   ||  ");
+      // Serial.println(ultraReadings[3]);
       lastProcessTime = millis();
       ultraCount=(ultraCount+1)%ULTRA_NUM;
    }
 }
 int getUltra(int which){
-	// return ultraReadings[which];
-  int maxVal = 0;
-  for (int i = 0; i < HISTORY_SIZE; ++i) {
-    if (lastReadings[which][i] > maxVal) {
-      maxVal = lastReadings[which][i];
-    }
-  }
-  return maxVal;
+	return ultraReadings[which];
 }
 
 int getUltraFront(){
   return getUltra(0);
+  //return getUltra(0);
 }
 
 int getUltraRight(){

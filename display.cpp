@@ -12,18 +12,6 @@ void displayDistance(){
   Serial.print("   ");
 }
 
-void displayCoordinate(){
-  Serial.print("x: ");
-  Serial.print(getX());
-  Serial.print("  |  y: ");
-  Serial.print(getY());
-  Serial.print("  |  x blocked: ");
-  Serial.print(getXBlocked());
-  Serial.print("  |  y blocked: ");
-  Serial.print(getYBlocked());
-  Serial.print("   ");
-}
-
 void displayCompass(){
   Serial.print("compass: ");
   Serial.print(getCompass());

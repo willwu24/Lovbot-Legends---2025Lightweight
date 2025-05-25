@@ -2,12 +2,14 @@
 #include "func.h"
 #include "player.h"
 #include "compass.h"
+#include "distance.h"
 #include "led.h"
 #include "button.h"
 #include "camera.h"
 #include "dribbler.h"
 #include "shooter.h"
 #include "Grayscale.h"
+#include "GoToCoordinate.h"
 #include "bluetooth.h"
 #include "goToBall.h"
 #include "compoundEye.h"
@@ -59,14 +61,14 @@ void setup() {
   // Serial.begin(9600);
   setSerialMonitor(); 
   setupDribbler();
-  setBotNum(0);
+  setBotNum(1);
   setupMotors();
   Serial.println("running basic setup...");
   setupKicker();
   setupCamera();
   Serial.println("entering setup loop");
   // setupDistance();
-  //setupCompass();
+  setupCompass();
   setupButton();
   setUpBallPID();
   setupBluetooth();
@@ -74,7 +76,6 @@ void setup() {
   initSensors();
   eyeSetup();
   setupDefense();
-  odoSetup();
   Serial.println("finished setting up whiteLine");
 
   
@@ -118,6 +119,9 @@ void setup() {
 
 void loop() {
   //some useful function to debug
+  
+  //while(1) setMotors(30,30,30,30);//uncomment to let the robot spin
+  //while(1) setDribbler(ON,LOW);//uncomment to let the dribbler spin
   //..........................................................................................
   //....................lllll.................................................................
   //...................pllllll................................................................
@@ -153,7 +157,7 @@ void loop() {
   //player run only once
   //setMotors(20,20,20,20);
   // while(1){
-  //   setMotors(20, 20, 20, 20);
+  //   setMotors(10, 10, 20, 20);
   // }
   player();
  

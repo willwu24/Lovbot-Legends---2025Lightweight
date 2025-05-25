@@ -5,7 +5,6 @@
 
 posInfo findCOByCorner(int, int, int, int);
 posInfo findCOByCenter(int, int, int, int);
-posInfo findCOBySmallest(int, int, int, int);
 void getCoordinate();
 posInfo findCO(int, int, int, int);
 bool isXBlocked(int, int);
@@ -14,7 +13,6 @@ int getX();
 int getY();
 int getXBlocked();
 int getYBlocked();
-void setOdoShiftX(int);
 posInfo getCurrPosition();
 
 #endif
