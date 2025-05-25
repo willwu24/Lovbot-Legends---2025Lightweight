@@ -12,14 +12,9 @@ void getCoordinate() {
   int front = getUltraFront();
   posInfo rawPosition = findCO(front, right, back, left);
   int unblocked = 0;
-  // Serial.print("odoShiftY: ");
-  // Serial.print(odoShiftY);
   if (isXBlocked(left, right)) { // remove prevposition and just keep returnposition?// || getLeftDistanceCM()<40 || getRightDistanceCM()<40
     //Serial.print("xblocked");
     if ((currTime - prevPosition.timeX) < acceptedInterval) {
-      //setLEDState(0,1);
-      //Serial.print("use odo");
-      // returnPosition.posX = prevPosition.posX;
       returnPosition.isXBlocked = true;//should be false
       returnPosition.posX = odoShiftX-getOdoX();
 
