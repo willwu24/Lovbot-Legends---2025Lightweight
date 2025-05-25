@@ -15,11 +15,6 @@ void setupDribbler(){//a setup function to make sure the dribbler is functioning
   long start = millis();
   ESC.write(30);
   delay(1000);
-  while(!buttonPressed(4))
-  {
-    // setLEDState(4,1);
-    updateButton();
-  }
 }
 
 

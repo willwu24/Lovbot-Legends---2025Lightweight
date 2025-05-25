@@ -32,7 +32,7 @@ int laserTolerance = 80;
 int attackMode; //yellow = 0 , blue = 1;
 int robotRole;
 int robotMode;
-int botNum; // 0: my bot, 1: robert bot
+int botNum = 1;
 moveType motion;
 
 int targetMode = 1;

@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include "func.h"
 #include "distance.h"
-#include "flyeye.h"
 #include "compass.h"
 #include "camera.h"
 #include "button.h"
