@@ -3,10 +3,6 @@
 
 #include <Arduino.h>
 #include "func.h"
-<<<<<<< HEAD
-#include "distance.h"
-=======
->>>>>>> 69cc2c2 (deleted unused files)
 #include "compass.h"
 #include "camera.h"
 #include "button.h"
