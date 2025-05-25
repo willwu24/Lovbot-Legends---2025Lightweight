@@ -3,14 +3,21 @@
 
 #include "player.h"
 
+// === Initialization ===
 void setupBluetooth();
-void transmit(int);
-int receive();
+
+// === Data Transmission ===
+void transmit(int data);
 void transmitData();
+
+// === Data Reception ===
+int receive();
 void receiveData();
-void sendBallStatus();
-int getReceiveArr(int);
-int getSendArr(int);
-void changeSendArr(int,int);
+
+// === Send/Receive Array Access ===
+int getReceiveArr(int index);
+int getSendArr(int index);
+void changeSendArr(int index, int data);
 int getArrLength();
-#endif
+
+#endif // BLUETOOTH_H

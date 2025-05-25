@@ -4,14 +4,26 @@
 #include <Arduino.h>
 #include "func.h"
 
+// Initializes button pins as inputs
 void setupButton();
-void updateButton();//update the state of the buttons
 
-bool getButtonState(int which);//return the state of given button
-bool buttonPressed(int which);//return true if a button is being pressed
+// Updates the state of all buttons
+void updateButton();
 
-void clearButtonState();//clear all the state of the buttons(set them to 0)
-bool buttonLongPressed(int which);//return true if given button is pressed and holded
+// Returns the toggled state (0 or 1) of a given button
+bool getButtonState(int which);
 
+// Returns true if the specified button is currently being pressed
+bool buttonPressed(int which);
+
+// Clears all button toggle states (sets to 0)
+void clearButtonState();
+
+// Returns true if the specified button is being held down (long press)
+// [Note: this must be implemented in the source file]
+bool buttonLongPressed(int which);
+
+// Handles specific logic based on button inputs (e.g., toggling mode)
 void checkButton();
-#endif
+
+#endif // BUTTON_H

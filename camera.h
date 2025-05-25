@@ -1,37 +1,40 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+
 #include <Arduino.h>
 #include <Wire.h>
 #include "func.h"
 
-// Setup and Data Retrieval
+// --- Initialization ---
 void setupCamera();
 void getCameraData();
 
-// Yellow Blob Functions
-int getYellowAngle();
-int getYellowDistance();
+// --- Yellow Blob Detection ---
+int  getYellowAngle();
+int  getYellowDistance();
 bool yellowDetected();
-int getYellowLeftEdgeAngle();
-int getYellowRightEdgeAngle();
+int  getYellowLeftEdgeAngle();
+int  getYellowRightEdgeAngle();
 
-// Blue Blob Functions
-int getBlueAngle();
-int getBlueDistance();
+// --- Blue Blob Detection ---
+int  getBlueAngle();
+int  getBlueDistance();
 bool blueDetected();
-int getBlueLeftEdgeAngle();
-int getBlueRightEdgeAngle();
+int  getBlueLeftEdgeAngle();
+int  getBlueRightEdgeAngle();
 
-// Home (Attack) and Opposing Target Functions
+// --- Home (Attack) Target ---
 bool homeDetected();
-bool opposingDetected();
-int getHomeAngle();
-int getHomeDistance();
-int getOpposingAngle();
-int getOpposingDistance();
-int getHomeLeftEdgeAngle();
-int getHomeRightEdgeAngle();
-int getOpposingLeftEdgeAngle();
-int getOpposingRightEdgeAngle();
+int  getHomeAngle();
+int  getHomeDistance();
+int  getHomeLeftEdgeAngle();
+int  getHomeRightEdgeAngle();
 
-#endif
+// --- Opposing Target ---
+bool opposingDetected();
+int  getOpposingAngle();
+int  getOpposingDistance();
+int  getOpposingLeftEdgeAngle();
+int  getOpposingRightEdgeAngle();
+
+#endif  // CAMERA_H

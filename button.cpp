@@ -1,83 +1,73 @@
 #include "button.h"
 #include "player.h"
 
-const int TOTAL=5;
-const int TOTAL_STATE=2;
+const int TOTAL = 5;
+const int TOTAL_STATE = 2;
 
-int buttonState[TOTAL]={0,0,0,0,0};
-int buttonP[TOTAL] = {0,0,0,0,0};//record if button is pressed
-int previousButtonPressed[TOTAL]={0,0,0,0,0};
-bool longPressed[TOTAL]={0,0,0,0,0};
+int buttonState[TOTAL] = {0};
+int buttonP[TOTAL] = {0};  // Tracks if button is pressed
+int previousButtonPressed[TOTAL] = {0};
+bool longPressed[TOTAL] = {0};
 
-//the function to process all the information from buttons
-
-void updateButton(){
-  
-  long now=millis();
-
-  for(int i=1;i<=TOTAL;i++){
-    buttonP[i]=!digitalRead(BUTTON_PIN[i]);
-    if(buttonP[i]==1&&previousButtonPressed[i]==0){
-      buttonState[i]=(buttonState[i]+1)%TOTAL_STATE;
+// Update all button states
+void updateButton() {
+  for (int i = 0; i < TOTAL; i++) {
+    buttonP[i] = !digitalRead(BUTTON_PIN[i]);
+    if (buttonP[i] == 1 && previousButtonPressed[i] == 0) {
+      buttonState[i] = (buttonState[i] + 1) % TOTAL_STATE;
     }
     previousButtonPressed[i] = buttonP[i];
   }
-
 }
 
-bool buttonPressed(int which){
-  return !digitalRead(BUTTON_PIN[which])==1;
+// Returns true if a specific button is currently pressed
+bool buttonPressed(int which) {
+  return !digitalRead(BUTTON_PIN[which]);
 }
 
-bool getButtonState(int which){
+// Returns the toggled state of a specific button
+bool getButtonState(int which) {
   return buttonState[which];
 }
 
-bool buttonLongPressed(int which){
+// Returns whether a button has been long pressed (not currently implemented)
+bool buttonLongPressed(int which) {
   return longPressed[which];
 }
 
-void clearButtonState(){
-  for(int i=0;i<TOTAL;i++){
-    buttonState[i]=0;
+// Resets all button states to 0
+void clearButtonState() {
+  for (int i = 0; i < TOTAL; i++) {
+    buttonState[i] = 0;
   }
 }
 
-void setupButton(){
-  for(int i = 1;i<=TOTAL;i++){
-    pinMode(BUTTON_PIN[i],INPUT);
+// Initializes all buttons as inputs
+void setupButton() {
+  for (int i = 0; i < TOTAL; i++) {
+    pinMode(BUTTON_PIN[i], INPUT);
   }
 }
 
-void checkButton(){
-
-  if (buttonPressed(3))
-  {
-    if (getAttackMode() == YELLOW)
-    {
+// Example use case: checks buttons for specific actions
+void checkButton() {
+  // Toggle attack mode with button 3
+  if (buttonPressed(3)) {
+    if (getAttackMode() == YELLOW) {
       setAttackMode(BLUE);
-    }
-    else{
+    } else {
       setAttackMode(YELLOW);
     }
   }
 
-  if (getAttackMode() == YELLOW)
-  {
-    setLEDState(3,1);
-  }
-  else
-  {
-    setLEDState(3,0);
-  }
-  
+  // Reflect attack mode using LED 3
+  setLEDState(3, getAttackMode() == YELLOW ? 1 : 0);
 
+  // Calibrate threshold with button 2
   if (buttonPressed(2)) {
-    setLEDState(2,1);
+    setLEDState(2, 1);
     calibrateThreshold();
-  }
-  else
-  {
-    setLEDState(2,0);
+  } else {
+    setLEDState(2, 0);
   }
 }
