@@ -1,26 +1,26 @@
 #include "display.h"
 
-void displayDistance(){
-  Serial.print("left distance: ");
+void displayDistance() {
+  Serial.print("Left Distance: ");
   Serial.print(getUltraLeft());
-  Serial.print("  |  Right distance: ");
+  Serial.print("  |  Right Distance: ");
   Serial.print(getUltraRight());
-  Serial.print("  |  Front distance: ");
+  Serial.print("  |  Front Distance: ");
   Serial.print(getUltraFront());
-  Serial.print("  |  Back distance: ");
+  Serial.print("  |  Back Distance: ");
   Serial.print(getUltraBack());
   Serial.print("   ");
 }
 
-void displayCompass(){
-  Serial.print("compass: ");
+void displayCompass() {
+  Serial.print("Compass: ");
   Serial.print(getCompass());
-  Serial.print("  |  RawCompass: ");
-  // Serial.print(getRawCompass());
+  Serial.print("  |  Raw Compass: ");
+  // Serial.print(getRawCompass()); // Uncomment if needed
   Serial.print("   ");
 }
 
-void displayCamera(){
+void displayCamera() {
   // Yellow blob information
   Serial.print("  |  Yellow Detected: ");
   Serial.print(yellowDetected());
@@ -32,7 +32,7 @@ void displayCamera(){
   Serial.print(getYellowLeftEdgeAngle());
   Serial.print("  |  Yellow Right Edge Angle: ");
   Serial.print(getYellowRightEdgeAngle());
-  
+
   // Blue blob information
   Serial.print("  |  Blue Detected: ");
   Serial.print(blueDetected());
@@ -44,5 +44,4 @@ void displayCamera(){
   Serial.print(getBlueLeftEdgeAngle());
   Serial.print("  |  Blue Right Edge Angle: ");
   Serial.print(getBlueRightEdgeAngle());
-
 }

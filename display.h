@@ -6,8 +6,9 @@
 #include "camera.h"
 #include "DFUltraTrig.h"
 
+// Display sensor values to Serial Monitor
 void displayDistance();
 void displayCompass();
 void displayCamera();
 
-#endif
+#endif // DISPLAY_H

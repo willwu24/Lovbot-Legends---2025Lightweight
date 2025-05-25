@@ -3,21 +3,28 @@
 
 #include "player.h"
 
+// Initialization
 void setupCoordinateMovement();
+
+// Movement functions
 void backPositionDefense();
 void moveToCoordinate();
-bool isParked(int);
-int speedCalculator(int);
-int distCalculator(posInfo, posInfo);
-int dirCalculator(posInfo, posInfo);
-moveInfo blockedCalculator(posInfo, posInfo);
+void cornerPark();
+
+// Coordinate utilities
+bool isParked(int dist);
+int speedCalculator(int dist);
+int distCalculator(posInfo curr, posInfo target);
+int dirCalculator(posInfo curr, posInfo target);
+moveInfo blockedCalculator(posInfo curr, posInfo target);
+
+// Location control
 bool changeLocation();
 void getNextCO();
 void getNextCORandom();
 void getNextCORandomAvoid();
-void setCenter();
 void setNeutralSpot();
-void cornerPark();
+void setCenter();
 void setTargetCO();
 
 #endif

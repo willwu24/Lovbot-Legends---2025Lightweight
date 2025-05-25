@@ -8,6 +8,4 @@ extern int global;
 
 void setupVariables();
 
-
-
 #endif

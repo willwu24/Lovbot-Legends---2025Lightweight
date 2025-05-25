@@ -3,12 +3,17 @@
 
 #include "player.h"
 
-posInfo findCOByCorner(int, int, int, int);
-posInfo findCOByCenter(int, int, int, int);
+// --- Coordinate Calculation ---
 void getCoordinate();
-posInfo findCO(int, int, int, int);
-bool isXBlocked(int, int);
-bool isYBlocked(int, int);
+posInfo findCO(int front, int right, int back, int left);
+posInfo findCOByCorner(int front, int right, int back, int left);
+posInfo findCOByCenter(int front, int right, int back, int left);
+
+// --- Obstruction Checks ---
+bool isXBlocked(int left, int right);
+bool isYBlocked(int front, int back);
+
+// --- Accessors ---
 int getX();
 int getY();
 int getXBlocked();
