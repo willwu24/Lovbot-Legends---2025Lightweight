@@ -53,7 +53,7 @@ void goToBallPID(){
 	int ballDir = getEyeAngle();
 	ballDist = getEyeValue();
 
-  setAngleThres(90);
+  setAngleThres(50);
 
   bool ballBehind = 90 < ballDir && ballDir < 270;
   bool ballRight = ballDir < 180;
@@ -145,7 +145,7 @@ void goToBallPID(){
 
   double angleConstant = (-4.28*pow(10,-5)*absAngle)+(0.0105*absAngle)+(-0.05);//-4.68*pow 0.0142, 0.135s
   angleConstant = constrain(angleConstant, 0, 1);
-  double offset = (dirDiff) * (dirRatio/100) * (angleConstant);
+  double offset = (dirDiff) * (dirRatio/100.0) * (angleConstant);
   // if (getEyeAngle() > 270 || getEyeAngle () < 90){
   //   offset = offset * (1.0-angleSlowdown);
   //   // offset

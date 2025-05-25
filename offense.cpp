@@ -18,8 +18,8 @@ unsigned long lastHasBall = -1;
 void offenseMain() {
   retrieveKicker();
   setTarget(0);
-  setTurningMode(0);
-  setTarget(0);
+  setTurningMode(1);
+  setAngleThres(30);
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
@@ -35,11 +35,10 @@ void offenseMain() {
   }
 
   // === Recently Detected White Line ===
-  else if ((millis() - lastWhite < 150 && !getFlip()) ||
+  else if ((millis() - lastWhite < 100 && !getFlip()) ||
            (millis() - lastWhite < 2000 && getFlip())) {
     Serial.println("Running White Line 50ms");
 
-    setMotorMode(0);
     resetBallPID();
     setDir(lastWhiteAngle);
     setSpeed(50);
@@ -48,10 +47,8 @@ void offenseMain() {
   // === Default Behavior ===
   else {
     wasWhite = 0;
-    setMotorMode(0);
 
     if (hasBall()) {
-      setTurningMode(0);
       goToBallPID();
 
       // Determine last target based on compass and ultrasonic
@@ -99,9 +96,6 @@ void offenseMain() {
     else if (getEyeValue() < 12) {
       lastHasBall = -1;
       firstBall = 0;
-
-      setMotorMode(0);
-      setTurningMode(0);
       resetBallPID();
       setCenter();
       setDir(STOP);
@@ -111,15 +105,10 @@ void offenseMain() {
     else {
       lastHasBall = -1;
       firstBall = 0;
-
-      setMotorMode(1);
-      setTurningMode(0);
       goToBallPID();
       setSpeed(30);
     }
   }
-
-  setTurningMode(0);
 }
 
 // === Grab Ball Rotation Logic ===

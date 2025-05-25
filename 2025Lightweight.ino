@@ -38,6 +38,7 @@ void setup() {
   setupBluetooth();
   initSensors();
   eyeSetup();
+  setUpBallPID();
   
   Serial.println("Finished setup.");
 }
