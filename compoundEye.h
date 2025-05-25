@@ -4,22 +4,22 @@
 #include <Arduino.h>
 #include "func.h"
 
-#define BALL_THRES 40
+// --- Thresholds ---
+#define BALL_THRES      40  // Minimum eye signal to detect the ball
 
-//for analog compound eye
-#define EYE_PORT_PIN A10
+// --- Analog Eye Pins ---
+#define EYE_PORT_PIN    A10 // Pin to read which eye segment is active
+#define EYE_VALUE_PIN   A11 // Pin to read signal strength
 
-//for analog compound eye
-#define EYE_VALUE_PIN A11
-
+// --- Setup ---
 void eyeSetup(); 
-int getEyePort();
-int getEyeValue();
-//Get angle of where ball is
-int getEyeAngle();
-int getEyeAngleSmooth();
-//tells if there is ball
 
+// --- Eye Readings ---
+int getEyePort();            // Returns active eye port index (0–17)
+int getEyeValue();           // Returns signal value from the active port
 
+// --- Ball Detection Angle ---
+int getEyeAngle();           // Returns crude angle to ball (0–360)
+int getEyeAngleSmooth();     // Returns interpolated angle to ball (0–360)
 
 #endif
