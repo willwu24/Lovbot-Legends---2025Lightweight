@@ -2,18 +2,26 @@
 #define GRAYSCALE_H
 
 #include <Arduino.h>
-#include "func.h"
 #include <queue>
+#include "func.h"
 
-// #define TOTAL_GRAYSCALE 7
-// #define THRES_TOLERANCE 80
-
-
+// ------------------------------
+// Initialization & Calibration
+// ------------------------------
 void initSensors();
 void calibrateThreshold();
-void calibrateLightweightThreshold();
 void resetCalibrateThreshold();
+
+// ------------------------------
+// Sensor Data Processing
+// ------------------------------
 void processSensors();
+void processWhiteAngle();
+int getLightDif(int currentLight, int lastLight);
+
+// ------------------------------
+// Threshold & Reading Utilities
+// ------------------------------
 void printSensorsThres();
 void printSensorsReading();
 void printSensorsWhite();
@@ -21,30 +29,33 @@ void printWhiteSensors();
 void printMaxThres();
 void printMinThres();
 void printDiffThres();
-int getLightDif(int currentLight, int lastLight);
 
+// ------------------------------
+// White Line Detection
+// ------------------------------
 int getFirstWhiteAngle();
 bool getFirstWhite();
 bool whiteDetected();
-void processWhiteAngle();
-int getWhiteAngle();
-int getRawWhiteAngle();
-
-
+void resetWhiteLine();
 void printWhiteHistory();
 int getWhiteCountHistory();
 
-void resetWhiteLine();
-
+// ------------------------------
+// Angle & Direction
+// ------------------------------
+int getWhiteAngle();
+int getRawWhiteAngle();
 bool getFlip();
 void setFlip(bool a);
-
-int getLastFlip();
+int getLastFlip();        // Not implemented in provided .cpp code
 void setFirstFlip(bool a);
 
+// ------------------------------
+// White Line Positioning
+// ------------------------------
 double getMagnitude();
 double getXSum();
 double getYSum();
 bool getInCorner();
 
-#endif
+#endif // GRAYSCALE_H

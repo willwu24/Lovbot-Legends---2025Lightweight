@@ -9,9 +9,6 @@ int lastWhiteAngle = 0;
 int lastTarget = 0;
 int firstBall = 0;
 
-const int minWhiteSpeed = 60;
-const int maxWhiteSpeed = 80;
-
 unsigned long lastHasBall = -1;
 
 // === Main Offense Control ===

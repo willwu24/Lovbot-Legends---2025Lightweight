@@ -4,10 +4,19 @@
 #include <Arduino.h>
 #include "func.h"
 
+// Initializes or updates the LED outputs based on current state
 void setLED();
-void setLEDState(int,int);
+
+// Sets the state (OFF, ON, BLINK) of a specific LED
+void setLEDState(int which, int state);
+
+// Turns off all LEDs
 void clearLEDState();
-void setLEDAll(int);
+
+// Sets all LEDs to a specific state (OFF, ON, BLINK)
+void setLEDAll(int state);
+
+// Updates LEDs based on game state (e.g., kickoff or line detected)
 void checkLED();
 
-#endif
+#endif // LED_H

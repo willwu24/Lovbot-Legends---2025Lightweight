@@ -6,8 +6,16 @@
 #include "camera.h"
 #include "compoundEye.h"
 #include "player.h"
+
+// ---------------------- Function Declarations ---------------------- //
+
+// Initializes ball-tracking PID controllers
 void setUpBallPID();
+
+// Controls robot to approach the ball using PID
 void goToBallPID();
+
+// Resets the PID state to prevent overshooting or instability
 void resetBallPID();
 
-#endif
+#endif // GOTOBALL_H

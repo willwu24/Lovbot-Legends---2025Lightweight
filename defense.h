@@ -1,18 +1,28 @@
 #ifndef DEFENSE_H
 #define DEFENSE_H
 
+#include <PID_v1.h>
 #include "func.h"
 #include "camera.h"
-#include <PID_v1.h>
 #include "grayscale.h"
 #include "compoundEye.h"
 #include "dribbler.h"
 
+// --- Defense Module Interface ---
+
+// Initialize defense PID controllers and state
 void setupDefense();
+
+// Main control loop for defense behavior
 void defenseMain();
-void whiteMove(int);
+
+// Adjust robot direction while following the white line
+void whiteMove(int dir);
+
+// Calculate and return the appropriate defense direction
 int getDefenseDir();
+
+// Reset internal state variables used in defense
 void resetVariables();
 
-#endif
-
+#endif  // DEFENSE_H

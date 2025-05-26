@@ -1,71 +1,70 @@
 #include "led.h"
 #include "player.h"
 
-const int TOTAL_LED=5;
-int LEDStates[TOTAL_LED] = {0,0,0,0,0};
-int LEDPins[TOTAL_LED]={33,34,35,36,37};
-long blinkTime[TOTAL_LED]={0,0,0,0,0};
+// Constants
+const int TOTAL_LED = 5;
+const int BLINK_INTERVAL = 300; // milliseconds
 
-void setLED(){
-  for(int i=0;i<TOTAL_LED;i++){
-    if(!LEDStates[i]) digitalWrite(LEDPins[i],LOW);
-    else if(LEDStates[i]==ON) digitalWrite(LEDPins[i],HIGH);
-    else if(LEDStates[i]==BLINK){
-      long now = millis();
-      
-      if(now-abs(blinkTime[i])>300){
-        if(blinkTime[i]>0){
-          blinkTime[i]=-now;
-          digitalWrite(LEDPins[i],LOW);
-        }
-        else{
-          blinkTime[i]=now;
-          digitalWrite(LEDPins[i],HIGH);
+// LED state tracking
+int LEDStates[TOTAL_LED] = {0, 0, 0, 0, 0};
+int LEDPins[TOTAL_LED] = {33, 34, 35, 36, 37};
+long blinkTime[TOTAL_LED] = {0, 0, 0, 0, 0};
 
+// Update the physical LED state based on LEDStates array
+void setLED() {
+  long now = millis();
+
+  for (int i = 0; i < TOTAL_LED; ++i) {
+    switch (LEDStates[i]) {
+      case OFF:
+        digitalWrite(LEDPins[i], LOW);
+        break;
+
+      case ON:
+        digitalWrite(LEDPins[i], HIGH);
+        break;
+
+      case BLINK:
+        if (now - abs(blinkTime[i]) > BLINK_INTERVAL) {
+          if (blinkTime[i] > 0) {
+            blinkTime[i] = -now;
+            digitalWrite(LEDPins[i], LOW);
+          } else {
+            blinkTime[i] = now;
+            digitalWrite(LEDPins[i], HIGH);
+          }
         }
-      }
+        break;
     }
   }
 }
 
-void setLEDState(int which, int state){
-  //which-=1;
-  if(which<TOTAL_LED&&which>=0&&state>=0&&state<3) LEDStates[which]=state;
+// Set individual LED state
+void setLEDState(int which, int state) {
+  if (which >= 0 && which < TOTAL_LED && state >= 0 && state <= 2) {
+    LEDStates[which] = state;
+  }
 }
 
-void setLEDAll(int state){
-  for(int i=0;i<TOTAL_LED;i++){
-    LEDStates[i]=state;
-    if(state==BLINK) blinkTime[i]=millis();
+// Set all LEDs to a specified state
+void setLEDAll(int state) {
+  for (int i = 0; i < TOTAL_LED; ++i) {
+    LEDStates[i] = state;
+    if (state == BLINK) {
+      blinkTime[i] = millis();
+    }
   }
   setLED();
 }
-void clearLEDState(){
+
+// Turn off all LEDs
+void clearLEDState() {
   setLEDAll(OFF);
 }
 
-void checkLED(){
-  // if (getFlip())
-  // {
-  //   setLEDState(1,1);
-  // }
-  // else
-  // {
-  //   setLEDState(1,0);
-  // }
-
-  if (getKickoff()){
-    setLEDState(4,1);
-  }
-  else{
-    setLEDState(4,0);
-  }
-
-  if (whiteDetected()){
-    setLEDState(0,1);
-  }
-  else
-  {
-    setLEDState(0,0);
-  }
+// Automatically control LED indicators based on game state
+void checkLED() {
+  setLEDState(4, getKickoff() ? ON : OFF);          // LED 4 for kickoff
+  setLEDState(0, whiteDetected() ? ON : OFF);       // LED 0 for white line detection
+  // Additional indicators can be added here
 }

@@ -2,6 +2,7 @@
 #define COORDINATE_H
 
 #include "player.h"
+#include "func.h"
 
 // --- Coordinate Calculation ---
 void getCoordinate();
