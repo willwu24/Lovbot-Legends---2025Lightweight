@@ -1,7 +1,7 @@
  #include "GoToBall.h"
 //can't go over
 //SPEED PID
-int minGoToBallSpeed = 25;//40
+int minGoToBallSpeed = 30;//40
 int maxGoToBallSpeed = 50;//16, 36//36-->46
 int speedDiff = maxGoToBallSpeed-minGoToBallSpeed;
 
@@ -14,7 +14,7 @@ int dirDiff = maxDir - minDir;
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
 double speedKp=0.15, speedKi=0.001, speedKd=0.001;// 0.74
-double dirKp=0.22, dirKi=0.00, dirKd=0.005;//0.01, 0.3, 0.004,                  0.26
+double dirKp=0.24, dirKi=0.00, dirKd=0.005;//0.01, 0.3, 0.004,                  0.26
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
