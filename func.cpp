@@ -3,8 +3,8 @@
 
 //variable declearation
 
-double motorCorrectionKp=0.12, motorCorrectionKi=0.00, motorCorrectionKd=0.00;
-double motorTurningKp=0.11, motorTurningKi=0.00, motorTurningKd=0.00;
+double motorCorrectionKp=0.21, motorCorrectionKi=0.00, motorCorrectionKd=0.02;
+double motorTurningKp=0.16, motorTurningKi=0.00, motorTurningKd=0.00;
 // double motorKp=0.21, motorKi=0.00, motorKd=0.012;
 double motorSetpoint, motorInput, motorCorrectionOutput, motorTurningOutput;
 
@@ -17,7 +17,7 @@ PID motorTurningPID(&motorInput, &motorTurningOutput, &motorSetpoint, motorTurni
 int angleThres = 35;
 int turnSpeed = 7;
 double motorChange = 3;
-int turningMode = 0;
+int turningMode = 1;
 int motorMode = 0;//0: immediate| 1: gradual
 int MIN_TURNING_SPEED = 6;
 int MAX_TURNING_SPEED = 25;
@@ -166,21 +166,6 @@ void move(){
   int speed2;
   int speed3;
   int speed4;
-
-  
-  // int angleDif = getAngleDif(getTarget());
-
-  // int refLine = 45 + 90*(d / 90) - 10*((d/90)%2);   
-  // int refAngle = abs(refLine - d);
-  // int sineAngle = 90+10*((d-refLine)/refAngle)*(pow(-1,(d/90))); 
-  // int faster = sinLaw(180-refAngle-sineAngle,sineAngle,s);
-  // int slower = sinLaw(refAngle,sineAngle,s);
-
-  // int speedCombination = (d / 90)%2;
-  // int motorSpeedComb [2][4] = {{slower, faster, slower, faster}, {faster, slower, faster, slower}};
-
-  // int shiftedDirection = (d + 45) % 360;
-  // int signCombination;
 
   int angleDif = getAngleDif(getTarget(),getCompass());
 

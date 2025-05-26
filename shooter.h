@@ -2,10 +2,12 @@
 #define SHOOTER_H
 
 #include "func.h"
-#define ON 1
+
+// === Kicker State Definitions ===
+#define ON  1
 #define OFF 0
 
-
+// === Kicker Control Functions ===
 void setupKicker();
 void kick();
 void retrieveKicker();

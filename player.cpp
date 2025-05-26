@@ -42,10 +42,10 @@ void player() {
     move();
 
     // === Debugging ===
-    Serial.print("Eye Sensor: ");
-    Serial.print(analogRead(EYE_PORT_PIN));
-    Serial.print("  Eye Angle: ");
-    Serial.println(getEyeAngle());
+    Serial.print("Speed: ");
+    Serial.println(getSpeed());
+    // Serial.print("  Eye Angle: ");
+    // Serial.println(getEyeAngle());
 
     // Additional debug (uncomment to use):
     // printSensorsReading();

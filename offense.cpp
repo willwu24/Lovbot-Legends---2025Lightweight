@@ -31,7 +31,6 @@ void offenseMain() {
     lastWhiteAngle = dirAngle;
 
     setDir(dirAngle);
-    setSpeed(50);
   }
 
   // === Recently Detected White Line ===
@@ -41,7 +40,6 @@ void offenseMain() {
 
     resetBallPID();
     setDir(lastWhiteAngle);
-    setSpeed(50);
   }
 
   // === Default Behavior ===
@@ -84,7 +82,7 @@ void offenseMain() {
       }
 
       kick();
-      setSpeed(50);
+      setSpeed(40);
     }
 
     // === Received Pause Signal ===
@@ -106,7 +104,6 @@ void offenseMain() {
       lastHasBall = -1;
       firstBall = 0;
       goToBallPID();
-      setSpeed(30);
     }
   }
 }
