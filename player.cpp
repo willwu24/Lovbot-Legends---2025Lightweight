@@ -26,6 +26,9 @@ void player() {
     processDFUltraTrig();
     getCoordinate();
 
+    printSensorsThres();
+    // Serial.println(" ");
+
     setLED();
     checkButton();
     checkLED();
@@ -41,16 +44,15 @@ void player() {
     move();
 
     // === Debugging ===
-    Serial.print("Speed: ");
-    Serial.println(getSpeed());
-    Serial.print(" Dir: ");
-    Serial.println(getDir());
+    // Serial.print("Speed: ");
+    // Serial.println(getSpeed());
+    // Serial.print(" Dir: ");
 
     // Additional debug (uncomment to use):
     // printSensorsReading();
     // printSensorsWhite();
     // transmit(1);
-    displayDistance();
+    // displayDistance();
     // displayCamera();
     // Serial.println(getLaser());
     // Serial.println(getYellowAngle());

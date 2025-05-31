@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <queue>
 #include "func.h"
+#include <EEPROM.h>
 
 // ------------------------------
 // Initialization & Calibration
@@ -51,6 +52,7 @@ int getWhiteCountHistory();
 int getWhiteAngle();
 int getRawWhiteAngle();
 bool getFlip();
+void getEEPROMThreshold();
 // void setFlip(bool a);           // Uncomment if implemented
 // int getLastFlip();              // Not implemented
 // void setFirstFlip(bool a);      // Not implemented

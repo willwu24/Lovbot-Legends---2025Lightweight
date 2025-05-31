@@ -72,6 +72,7 @@ void initSensors() {
   whiteLinePID.SetMode(AUTOMATIC);
   whiteLinePID.SetOutputLimits(-50, 50);
   whiteLineSetPoint = 0;
+  getEEPROMThreshold();
 }
 
 // === Calibration ===
@@ -95,6 +96,17 @@ void calibrateThreshold() {
 
     sensorThres[i] = minSensorThres[i] + (maxSensorThres[i] - minSensorThres[i]) * sensitivity;
     sensorThres[i + 16] = minSensorThres[i + 16] + (maxSensorThres[i + 16] - minSensorThres[i + 16]) * sensitivity;
+  }
+  for (int i = 0 ; i < 32 ; i++) {
+    EEPROM.write(i, sensorThres[i]/2);
+  }
+}
+
+void getEEPROMThreshold(){
+  int testThresholds[32];
+  for (int i = 0; i < 32; i++){
+    testThresholds[i] = EEPROM.read(i);
+    sensorThres[i]=testThresholds[i]*2;
   }
 }
 
