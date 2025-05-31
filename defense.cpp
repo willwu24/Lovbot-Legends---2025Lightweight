@@ -1,5 +1,12 @@
 #include "defense.h"
 
+// --- TODO ---
+/*
+Make it so it doesn't own goal
+Get ball from neutral spot
+Stay on white line
+*/
+
 // --- Constants ---
 double MOVE_OFFSET = 10.0;
 const int minDefenseSpeed = 30;
@@ -41,17 +48,28 @@ void setupDefense() {
 // --- Main defense behavior ---
 void defenseMain() {
   setAngleThres(20);
-
+  setTurningMode(1);
   if (whiteDetected()) {
     whiteMove(getDefenseDir());
     prevWhiteDetected = -1;
-  } else {
+  } 
+  else {
     if (prevWhiteDetected == -1) {
       prevWhiteDetected = millis();
-    } else if (millis() - prevWhiteDetected < 1000) {
-      setDir(whiteDir);
-    } else {
-      setDir(180);  // Default fallback direction
+    } 
+    // else if (millis() - prevWhiteDetected < 1000) { //use last white line
+    //   setDir(whiteDir);
+    // } 
+    else {
+      if(!homeDetected()){
+        setDir(180);
+      }
+      else if(getUltraBack()<25){
+        setDir((getHomeAngle()+180)%360);
+      }
+      else{
+        setDir(getHomeAngle());
+      }
     }
   }
 

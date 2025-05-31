@@ -95,72 +95,159 @@ double getMotorChange() { return motorChange; }
 
 //---------------------------------------------------------------- MOVEMENT
 
-void move() {
+void move(){
   int d = motion.direction;
   int s = motion.speed;
-  int angleDif = getAngleDif(getTarget(), getCompass());
+  int targetAngle = motion.target;
+  int degree1;
+  int degree2;
+  int slowerSpeed = s;
+  int speed1;
+  int speed2;
+  int speed3;
+  int speed4;
 
-  int refLine = 50 + 90 * (d / 90) - 10 * ((d / 90) % 2);
+  int angleDif = getAngleDif(getTarget(),getCompass());
+
+  int refLine = 50 + 90*(d / 90) - 10*((d/90)%2);   
   int refAngle = abs(refLine - d);
-  int sineAngle = 90 + 10 * ((d - refLine) / refAngle) * pow(-1, (d / 90));
-  int faster = sinLaw(180 - refAngle - sineAngle, sineAngle, s);
-  int slower = sinLaw(refAngle, sineAngle, s);
+  int sineAngle = 90+10*((d-refLine)/refAngle)*(pow(-1,(d/90))); 
+  int faster = sinLaw(180-refAngle-sineAngle,sineAngle,s);
+  int slower = sinLaw(refAngle,sineAngle,s);
 
-  int speedComb = (d / 90) % 2;
-  int motorSpeedComb[2][4] = {
-    {slower, faster, slower, faster},
-    {faster, slower, faster, slower}
-  };
+  int speedCombination = (d / 90)%2;
+  int motorSpeedComb [2][4] = {{slower, faster, slower, faster}, {faster, slower, faster, slower}};
 
-  int shiftedDir = (d + 50) % 360;
-  int signComb = shiftedDir < 90 ? 0 : shiftedDir < 180 ? 1 : shiftedDir < 270 ? 2 : 3;
+  int shiftedDirection = (d + 50) % 360;
+  int signCombination;
 
+  // PID
   motorInput = angleDif;
   motorCorrectionPID.Compute();
   motorTurningPID.Compute();
 
-  int speed[4];
-  for (int i = 0; i < 4; i++) {
-    speed[i] = motorSign[signComb][i] * motorSpeedComb[speedComb][i];
+
+  if(shiftedDirection<90){
+    signCombination=0;
+  }
+  else if(shiftedDirection<180){
+    signCombination=1;
+  }
+  else if(shiftedDirection<270){
+    signCombination=2;
+  }
+  else{
+    signCombination=3;
   }
 
-  if (d == STOP) {
-    memset(speed, 0, sizeof(speed));
+  speed1 = motorSign[signCombination][0] * motorSpeedComb[speedCombination][0];
+  speed2 = motorSign[signCombination][1] * motorSpeedComb[speedCombination][1];
+  speed3 = motorSign[signCombination][2] * motorSpeedComb[speedCombination][2];
+  speed4 = motorSign[signCombination][3] * motorSpeedComb[speedCombination][3];
+  if(d == STOP){//both situation stops
+    speed1 = 0;
+    speed2 = 0;
+    speed3 = 0;
+    speed4 = 0;
   }
-
+  
+  // now check mode of turning speed (manual or PID)
   if (turningMode == MANUAL) {
-    if (abs(angleDif) > angleThres) {
-      int val = angleDif < 0 ? turnSpeed : -turnSpeed;
-      for (int &s : speed) s = val;
-    } else if (abs(angleDif) > 10) {
-      if (d == STOP) {
-        int val = angleDif < 0 ? turnSpeed : -turnSpeed;
-        for (int &s : speed) s = val;
-      } else {
-        for (int &s : speed) s -= -motorCorrectionOutput;
+    // manual mode
+    if (abs(angleDif)>angleThres){//have to turn
+      if (angleDif<0){
+        //turn clockwise
+        speed1=turnSpeed;
+        speed2=turnSpeed;
+        speed3=turnSpeed;
+        speed4=turnSpeed;
+      }
+      else{
+        //turn counter-clockwise
+        speed1=-turnSpeed;
+        speed2=-turnSpeed;
+        speed3=-turnSpeed;
+        speed4=-turnSpeed;
       }
     }
-  } else {
-    if (abs(angleDif) > angleThres) {
-      motorTurningOutput = constrain(motorTurningOutput, MIN_TURNING_SPEED, MAX_TURNING_SPEED);
-      int val = angleDif < 0 ? motorTurningOutput : -motorTurningOutput;
-      for (int &s : speed) s = val;
-    } else if (abs(angleDif) > 10) {
-      if (d == STOP) {
-        int val = angleDif < 0 ? motorTurningOutput : -motorTurningOutput;
-        for (int &s : speed) s = val;
-      } else {
-        for (int &s : speed) s -= -motorCorrectionOutput;
+    else if (abs(angleDif)>10){
+      if(d==STOP){
+        if (angleDif<0){
+          speed1 = turnSpeed;
+          speed2 = turnSpeed;
+          speed3 = turnSpeed;
+          speed4 = turnSpeed;
+        }
+        else{
+          speed1 = -turnSpeed;
+          speed2 = -turnSpeed;
+          speed3 = -turnSpeed;
+          speed4 = -turnSpeed;
+        }
+      }
+      else{
+        //correction without turning
+        speed1-=-motorCorrectionOutput;
+        speed2-=-motorCorrectionOutput;
+        speed3-=-motorCorrectionOutput;
+        speed4-=-motorCorrectionOutput;
       }
     }
   }
-
-  if (motorMode == 0) {
-    setMotors(speed[0], speed[1], speed[2], speed[3]);
-  } else {
-    setMotorsGradual(speed[0], speed[1], speed[2], speed[3]);
+  else { // PID mode
+    if (abs(angleDif)>angleThres){//have to turn
+      if (angleDif<0){
+        //turn clockwise
+        motorTurningOutput = constrain(motorTurningOutput, MIN_TURNING_SPEED, MAX_TURNING_SPEED);
+        speed1=motorTurningOutput;
+        speed2=motorTurningOutput;
+        speed3=motorTurningOutput;
+        speed4=motorTurningOutput;
+      }
+      else{
+        //turn counter-clockwise
+        motorTurningOutput = constrain(motorTurningOutput, -MAX_TURNING_SPEED, -MIN_TURNING_SPEED);
+        speed1=motorTurningOutput;
+        speed2=motorTurningOutput;
+        speed3=motorTurningOutput;
+        speed4=motorTurningOutput;
+      }
+    }
+    else if (abs(angleDif)>10){
+      if(d==STOP){
+        if (angleDif<0){
+          motorTurningOutput = constrain(motorTurningOutput, MIN_TURNING_SPEED, MAX_TURNING_SPEED);
+          speed1 = motorTurningOutput;
+          speed2 = motorTurningOutput;
+          speed3 = motorTurningOutput;
+          speed4 = motorTurningOutput;
+        }
+        else{
+          motorTurningOutput = constrain(motorTurningOutput, -MAX_TURNING_SPEED, -MIN_TURNING_SPEED);
+          speed1 = motorTurningOutput;
+          speed2 = motorTurningOutput;
+          speed3 = motorTurningOutput;
+          speed4 = motorTurningOutput;
+        }
+      }
+      else{
+        //correction without turning
+        speed1-=-motorCorrectionOutput;
+        speed2-=-motorCorrectionOutput;
+        speed3-=-motorCorrectionOutput;
+        speed4-=-motorCorrectionOutput;
+      }
+    }
   }
+  if(motorMode == 0){
+    setMotors(speed1,speed2,speed3,speed4);
+  }
+  else{
+    setMotorsGradual(speed1,speed2,speed3,speed4);
+  }
+  // Serial.print(motorCorrectionOutput);
 }
+
 
 //---------------------------------------------------------------- MOTOR HELPERS
 
