@@ -96,7 +96,7 @@ int getDefenseDir() {
 
   defenseSpeedOffset = cornerRatio * angleRatio * 60;
 
-  // Reverse if defense direction misaligned with ball
+  // Reverse direction if defense robot near the edge of white line
   if ((whiteDir < 155 && getEyeAngle() > 180) || (whiteDir > 205 && getEyeAngle() < 180)) {
     defenseDir = (defenseDir + 180) % 360;
   }

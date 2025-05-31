@@ -3,7 +3,6 @@
 
 /*
   NOTE:
-  - hasBall() is set to always return false
   - Blocking is removed
   - No parking flag implemented
 

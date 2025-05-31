@@ -30,7 +30,4 @@ void dribblerControl();
 void shooterControl();
 bool shootStrategyCondition();
 
-// === Misc Utilities / Experimental ===
-void miracleButton();
-
 #endif

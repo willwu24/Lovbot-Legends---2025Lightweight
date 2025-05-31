@@ -1,10 +1,8 @@
 #include "config.h"
 
 int motor_dir[5];
-int global;
 
 void setupVariables(){
-  global = 10;
   int n = sizeof(motor_dir) / sizeof(motor_dir[0]);
   if(getBotNum()==0){// my bot
     int new_motor_dir[5] = {0,-1,-1,-1,-1};

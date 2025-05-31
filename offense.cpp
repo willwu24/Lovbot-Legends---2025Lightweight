@@ -46,7 +46,7 @@ void offenseMain() {
     if (hasBall()) {
       goToBallPID();
 
-      // Determine last target based on compass and ultrasonic
+      // Go to the goal
       if (getCompass() < 10 || getCompass() > 350) {
         if (getUltraLeft() > 60 && getUltraRight() > 60) {
           lastTarget = 0;
@@ -87,7 +87,7 @@ void offenseMain() {
       setDir(STOP);
     }
 
-    // === Lost Ball ===
+    // === No ball ===
     else if (getEyeValue() < 12) {
       lastHasBall = -1;
       firstBall = 0;
@@ -96,7 +96,7 @@ void offenseMain() {
       setDir(STOP);
     }
 
-    // === Searching for Ball ===
+    // === Go to ball ===
     else {
       lastHasBall = -1;
       firstBall = 0;
@@ -105,7 +105,7 @@ void offenseMain() {
   }
 }
 
-// === Grab Ball Rotation Logic ===
+// === Turning Strategy ===
 void grabBall() {
   while (hasBall() && getCompass() < 45 && !whiteDetected()) {
     if (getUltraLeft() > getUltraRight()) {
