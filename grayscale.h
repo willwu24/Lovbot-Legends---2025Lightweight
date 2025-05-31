@@ -12,6 +12,11 @@ void initSensors();
 void calibrateThreshold();
 void resetCalibrateThreshold();
 
+// EEPROM Storage
+void saveThresholdsToEEPROM();
+bool loadThresholdsFromEEPROM();
+void resetEEPROM();  // Optional, only if you use this function
+
 // ------------------------------
 // Sensor Data Processing
 // ------------------------------
@@ -46,9 +51,9 @@ int getWhiteCountHistory();
 int getWhiteAngle();
 int getRawWhiteAngle();
 bool getFlip();
-void setFlip(bool a);
-int getLastFlip();        // Not implemented in provided .cpp code
-void setFirstFlip(bool a);
+// void setFlip(bool a);           // Uncomment if implemented
+// int getLastFlip();              // Not implemented
+// void setFirstFlip(bool a);      // Not implemented
 
 // ------------------------------
 // White Line Positioning
