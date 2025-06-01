@@ -1,8 +1,8 @@
 #include "GoToBall.h"
 
 // ---------------------- SPEED PID PARAMETERS ---------------------- //
-int minGoToBallSpeed = 30;        // Minimum robot speed
-int maxGoToBallSpeed = 50;        // Maximum robot speed
+int minGoToBallSpeed = 20;        // Minimum robot speed
+int maxGoToBallSpeed = 40;        // Maximum robot speed
 int speedDiff = maxGoToBallSpeed - minGoToBallSpeed;
 
 // ---------------------- DIRECTION PID PARAMETERS ---------------------- //
@@ -15,7 +15,7 @@ double ballClosest, ballFarthest, ballDist;
 double speedRatio, distanceRatio;
 
 double speedKp = 0.15, speedKi = 0.001, speedKd = 0.001;
-double dirKp = 0.24, dirKi = 0.00, dirKd = 0.005;
+double dirKp = 0.30, dirKi = 0.00, dirKd = 0.005;
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;

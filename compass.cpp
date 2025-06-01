@@ -3,7 +3,7 @@
 // --- Compass Configuration ---
 long compass_max_value = 480;
 int compass_type = 0;
-Adafruit_BNO055 bno = Adafruit_BNO055(55);
+Adafruit_BNO055 bno = Adafruit_BNO055(55);//55
 
 // --- Compass Tracking ---
 int heading = 359;

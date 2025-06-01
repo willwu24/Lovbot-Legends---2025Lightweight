@@ -22,7 +22,5 @@ void whiteMove(int dir);
 // Calculate and return the appropriate defense direction
 int getDefenseDir();
 
-// Reset internal state variables used in defense
-void resetVariables();
 
 #endif  // DEFENSE_H

@@ -8,7 +8,7 @@
 
 // --- BNO055 Configuration Constants ---
 #define RST              11    // BNO RST pin number
-#define BNO_ADDR         0x28  // I2C address of the BNO055
+#define BNO_ADDR         0x17  // I2C address of the BNO055, 28
 #define PAGE_ID          0x07  // Register for selecting register page
 #define ACC_DATA_X_LSB   0x08  // Page 0: Acceleration Data X LSB
 #define OPR_MODE         0x3D  // Page 0: Operation Mode register

@@ -14,7 +14,7 @@
 void player() {
   // === Initialization ===
   setAttackMode(YELLOW);     // Set goal to shoot on
-  setRobotRole(DEFENSE);     // Set initial role
+  setRobotRole(OFFENSE);     // Set initial role
   setupVariables();
 
   while (1) {
@@ -26,7 +26,7 @@ void player() {
     processDFUltraTrig();
     getCoordinate();
 
-    printSensorsThres();
+    //printSensorsThres();
     // Serial.println(" ");
 
     setLED();
@@ -45,15 +45,13 @@ void player() {
 
     // === Debugging ===
     // Serial.print("Speed: ");
-    // Serial.println(getSpeed());
-    // Serial.print(" Dir: ");
+    // Serial.print(getSpeed());
+    Serial.print(" ball dist: ");
+    Serial.println(getEyeValue());
 
     // Additional debug (uncomment to use):
     // printSensorsReading();
     // printSensorsWhite();
-    // transmit(1);
-    // displayDistance();
-    // displayCamera();
     // Serial.println(getLaser());
     // Serial.println(getYellowAngle());
     // Serial.println(getCompass());

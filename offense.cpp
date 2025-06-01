@@ -41,65 +41,14 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    wasWhite = 0;
-
-    if (hasBall()) {
+    if (hasBall()){
       goToBallPID();
-
-      // Go to the goal
-      if (getCompass() < 10 || getCompass() > 350) {
-        if (getUltraLeft() > 60 && getUltraRight() > 60) {
-          lastTarget = 0;
-        }
-        else if (getUltraLeft() < getUltraRight()) {
-          lastTarget = 60;
-        }
-        else {
-          lastTarget = 300;
-        }
-      }
-
-      if (lastHasBall == -1) {
-        lastHasBall = millis();
-      }
-
-      if (millis() - lastHasBall > 100) {
-        Serial.print("KICK!");
-        kick();
-      }
-
-      if (getUltraFront() < 25) {
-        grabBall();
-      }
-
-      if (homeDetected()) {
-        setDir((getHomeAngle() + 180) % 360);
-      } else {
-        setDir(lastTarget);
-      }
-
-      kick();
-      setSpeed(40);
     }
-
-    // === Received Pause Signal ===
-    else if (receive() == 1) {
+    else if (getEyeValue() < 12){
       setDir(STOP);
     }
-
-    // === No ball ===
-    else if (getEyeValue() < 12) {
-      lastHasBall = -1;
-      firstBall = 0;
-      resetBallPID();
-      setCenter();
-      setDir(STOP);
-    }
-
-    // === Go to ball ===
-    else {
-      lastHasBall = -1;
-      firstBall = 0;
+    else
+    {
       goToBallPID();
     }
   }

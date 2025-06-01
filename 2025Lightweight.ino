@@ -28,7 +28,7 @@ void setup() {
 
   Serial.println("Running basic setup...");
   setSerialMonitor(); 
-  setBotNum(1);
+  setBotNum(0);
   setupMotors();
 
   Serial.println("Setting up sensors...");
