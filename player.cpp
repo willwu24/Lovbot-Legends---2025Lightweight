@@ -14,7 +14,7 @@
 void player() {
   // === Initialization ===
   setAttackMode(YELLOW);     // Set goal to shoot on
-  setRobotRole(OFFENSE);     // Set initial role
+  setRobotRole(DEFENSE);     // Set initial role
   setupVariables();
 
   while (1) {

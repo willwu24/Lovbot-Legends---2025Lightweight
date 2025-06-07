@@ -2,7 +2,7 @@
 #define GOTOBALL_H
 
 #include <Arduino.h>
-#include <PID_v1.h>
+#include <PID_v2.h>
 #include "camera.h"
 #include "compoundEye.h"
 #include "player.h"

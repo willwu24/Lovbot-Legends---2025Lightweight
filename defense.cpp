@@ -75,7 +75,7 @@ void defenseMain(){
       else{
         setDir(getHomeAngle());
         int backSpeed = (getHomeDistance()-20)/3;
-        backSpeed = constrain(backSpeed, 10, 30);
+        backSpeed = constrain(backSpeed, 20, 40);
         setSpeed(backSpeed);
       }
     }

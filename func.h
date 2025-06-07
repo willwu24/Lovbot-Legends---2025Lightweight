@@ -14,7 +14,7 @@ static posInfo currPosition;
 #include "button.h"
 #include "led.h"
 #include "shooter.h"
-#include <PID_v1.h>
+#include <PID_v2.h>
 #include "compoundEye.h"
 #include "DFUltraTrig.h"
 #include "config.h"
