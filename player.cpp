@@ -44,9 +44,9 @@ void player() {
     move();
 
     // === Debugging ===
-    // Serial.print("Speed: ");
-    // Serial.print(getSpeed());
-    Serial.print(" ball dist: ");
+    Serial.print("Dir: ");
+    Serial.print(getDir());
+    Serial.print(" EyeValue: ");
     Serial.println(getEyeValue());
 
     // Additional debug (uncomment to use):

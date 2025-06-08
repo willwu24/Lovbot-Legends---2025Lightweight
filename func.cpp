@@ -32,7 +32,7 @@ bool kickoff = false;
 int botNum = 1;
 int targetMode = 1;
 
-int lastLaser = 0;
+long lastLaser = 0;
 bool laserSensed = false;
 int laserTimer = -10000;
 int laserCounter = -1;
@@ -322,9 +322,14 @@ bool getLaser() {
 bool hasBall() {
   if (getLaser() && (getEyeAngle() < 40 || getEyeAngle() > 320)) {
     laserCounter++;
-    if (getBotNum() == 1 || laserCounter > 5) return true;
-    return false;
+    lastLaser = millis();
+    return true;
+    // if (getBotNum() == 1 || laserCounter > 2) return true;
+    // return false;
   } else {
+    if(millis()-lastLaser<10){
+      return true;
+    }
     laserCounter = -1;
     return false;
   }

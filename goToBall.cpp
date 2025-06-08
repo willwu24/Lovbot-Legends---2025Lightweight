@@ -25,7 +25,7 @@ PID dirPID(&ballDist, &distanceRatio, &ballFarthest, dirKp, dirKi, dirKd, REVERS
 
 // ---------------------- Setup Function ---------------------- //
 void setUpBallPID() {
-    if (getBotNum == 0) {
+    if (getBotNum() == 0) {
         ballClosest = 750;
     } else {
         ballClosest = 750;
