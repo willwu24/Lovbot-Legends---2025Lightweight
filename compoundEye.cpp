@@ -3,11 +3,8 @@
 const int eyeNum = 18;
 
 // Thresholds for mapping analog port values to eye sectors (0–17)
-int eyePortThres[eyeNum] = {
-  32, 63, 94, 125, 157, 188, 220, 254, 285,
-  317, 338, 368, 398, 411, 442, 474, 502, 533
-};
-
+int eyePortThres[eyeNum] = { 32, 63, 94, 125, 157, 188, 220, 254, 285, 317, 338, 374, 405, 436, 467, 493, 525, 555};
+//                           0   20  40  60   80   100  120  140  160  180  200  220  240  260  280  300  320  340
 // --- Setup ---
 void eyeSetup() {
   pinMode(EYE_PORT_PIN, INPUT);
