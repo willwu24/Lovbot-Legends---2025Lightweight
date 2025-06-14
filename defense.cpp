@@ -50,6 +50,9 @@ void defenseMain(){
   retrieveKicker();
   setAngleThres(25);
   setTarget(0);
+  if(homeDetected()){
+    lastGoalAngle = getHomeAngle();
+  }
   if(hasBall()){
     Serial.print("HAS BALL");
 
@@ -112,7 +115,7 @@ void defenseMain(){
     firstBallFront = -1;
     gettingBall = false;
     firstHasBall = -1;
-    if(homeDetected()){
+    if(homeDetected()&&(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>15||(getHomeDistance()>40&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>5)){
       if(getUltraBack()<25){
         setSpeed(30);
         if(getEyeValue()<12){
@@ -136,13 +139,21 @@ void defenseMain(){
         setSpeed(backSpeed);
       }
     }
+    else{
+      if(lastGoalAngle>180){
+        setDir(270);
+      }
+      else{
+        setDir(90);
+      }
+    }
   }
-  Serial.print(firstBallFront);
-  Serial.print(" ");
-  Serial.print(gettingBall);
-  Serial.print(" ");
-  Serial.print(firstHasBall);
-  Serial.print(" ");
+  // Serial.print(firstBallFront);
+  // Serial.print(" ");
+  // Serial.print(gettingBall);
+  // Serial.print(" ");
+  // Serial.print(firstHasBall);
+  // Serial.print(" ");
 
 }
 

@@ -14,9 +14,9 @@
 void player() {
   // === Initialization ===
   setAttackMode(YELLOW);     // Set goal to shoot on
-  setRobotRole(OFFENSE);     // Set initial role
+  setRobotRole(DEFENSE);     // Set initial role
   setupVariables();
-
+  
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
@@ -44,12 +44,13 @@ void player() {
     move();
 
     // === Debugging ===
-    Serial.print("Eye num: ");
-    Serial.print(analogRead(EYE_PORT_PIN));
+    Serial.print("Dir: ");
+    Serial.print(getDir());
     Serial.print(" Eye Angle: ");
     Serial.println(getEyeAngle());
 
     // Additional debug (uncomment to use):
+    displayCamera();
     // printSensorsReading();
     // printSensorsWhite();
     // Serial.println(getLaser());

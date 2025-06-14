@@ -5,8 +5,9 @@ struct posInfo { int posX; int posY; bool isXBlocked; bool isYBlocked; long time
 struct posData { int posX; int posY; unsigned long timeX; unsigned long timeY; };
 struct moveInfo { int dir; int dist; };
 struct moveType { int speed; int direction; int target; };
-// struct bot0Info {int motor_dir_0[4] = {0,-1,-1,-1}; int ballClosest = 750;};
-// struct bot1Info {int motor_dir_1[4] = {0,-1,-1,-1}; int ballClosest = 750;};
+struct botZeroInfo {int motor_dir[4] = {0,-1,-1,-1}; int ballClosest = 750;};
+struct botOneInfo {int motor_dir[4] = {0,-1,-1,-1}; int ballClosest = 750;};
+struct botCurrInfo {int motor_dir[4]; int ballClosest;};
 static posData prevPosition;
 static posInfo currPosition;
 
