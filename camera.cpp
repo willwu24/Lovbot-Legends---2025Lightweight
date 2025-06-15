@@ -96,6 +96,7 @@ bool blueDetected() {
     return true;
   }
   return (millis() - lastBlue < 200);
+  // return false;
 }
 
 int getBlueLeftEdgeAngle() {

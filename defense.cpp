@@ -96,7 +96,25 @@ void defenseMain(){
     prevWhiteDetected = -1;
     defenseSpeedOffset = constrain(defenseSpeedOffset,5,40);
     setSpeed(defenseSpeedOffset);
-    if((getEyeAngle()<=40||getEyeAngle()>=320)&&getEyeValue()>500){//ball in front
+    if(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())<5&&homeDetected()){
+      setSpeed(30);
+      if(getUltraBack()>24){
+        setDir(getHomeAngle());
+      }
+      else{
+        setDir(0);
+      }
+    }
+    else if(!homeDetected()){
+      setSpeed(15);
+      if(lastGoalAngle<180){
+        setDir(45);
+      }
+      else{
+        setDir(315);
+      }
+    }
+    else if((getEyeAngle()<=40||getEyeAngle()>=320)&&getEyeValue()>500){//ball in front
       Serial.print("ball front");
       if(firstBallFront==-1){
         firstBallFront = millis();
@@ -115,7 +133,7 @@ void defenseMain(){
     firstBallFront = -1;
     gettingBall = false;
     firstHasBall = -1;
-    if(homeDetected()&&(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>15||(getHomeDistance()>40&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>5)){
+    if(homeDetected()&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>15||(getHomeDistance()>40&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>3)){
       if(getUltraBack()<25){
         setSpeed(30);
         if(getEyeValue()<12){
@@ -140,6 +158,7 @@ void defenseMain(){
       }
     }
     else{
+      setSpeed(20);
       if(lastGoalAngle>180){
         setDir(270);
       }

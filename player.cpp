@@ -46,11 +46,12 @@ void player() {
     // === Debugging ===
     Serial.print("Dir: ");
     Serial.print(getDir());
-    Serial.print(" Eye Angle: ");
-    Serial.println(getEyeAngle());
+    Serial.print(" Speed: ");
+    Serial.println(getSpeed());
 
     // Additional debug (uncomment to use):
     displayCamera();
+    displayDistance();
     // printSensorsReading();
     // printSensorsWhite();
     // Serial.println(getLaser());
