@@ -19,4 +19,8 @@
 void offenseMain();
 void grabBall();
 
+double calculateRepelEffect(int distance, int startThreshold, int hardThreshold);
+void applyAirWall();
+
+
 #endif
