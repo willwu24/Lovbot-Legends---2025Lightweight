@@ -9,6 +9,7 @@ void setupCoordinateMovement();
 // Movement functions
 void backPositionDefense();
 void moveToCoordinate();
+void goToCoordinate(int tarX, int tarY);
 void cornerPark();
 
 // Coordinate utilities

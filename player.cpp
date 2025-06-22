@@ -46,15 +46,12 @@ void player() {
     } else {
       defenseMain();
     }
-
+    //goToCoordinate(0, 0);
     // === Actuation ===
     move();
 
     // === Debugging ===
-    // Serial.print("Dir: ");
-    // Serial.print(getDir());
-    // Serial.print(" Speed: ");
-    // Serial.println(getSpeed());
+
 
     // Additional debug (uncomment to use):
     //displayCamera();
@@ -62,7 +59,7 @@ void player() {
     //displayCompass();
     // printSensorsReading();
     // printSensorsWhite();
-    // Serial.println(getLaser());
+    // Serial.println(analogRead(LAZER_PIN));
     // Serial.println(getYellowAngle());
     // Serial.println(getCompass());
     // Serial.println(hasBall());
