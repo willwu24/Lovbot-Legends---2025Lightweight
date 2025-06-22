@@ -5,7 +5,7 @@
 
 #define ULTRA_NUM 4
 
-// Ultrasonic pins: Front, Right, Back, Left
+// Ultrasonic pins:      Front, Right, Back, Left
 int trigechoPin[ULTRA_NUM] = {A9, A13, A8, A12};
 
 uint16_t distance;
@@ -50,7 +50,7 @@ int getUltra(int which) {
   return ultraReadings[which];
 }
 
-int getUltraFront() { return getUltra(0); }
-int getUltraRight() { return getUltra(1); }
-int getUltraBack()  { return getUltra(2); }
-int getUltraLeft()  { return getUltra(3); }
+int getUltraFront() { return analogRead(trigechoPin[0]); }
+int getUltraRight() { return analogRead(trigechoPin[1]); }
+int getUltraBack() { return analogRead(trigechoPin[2]); }
+int getUltraLeft() { return analogRead(trigechoPin[3]); }

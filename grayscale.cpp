@@ -366,6 +366,16 @@ int getLightDif(int currentLight, int lastLight){//what
   return output;
 }
 
+void getWhiteSensor(bool output[32]){
+  for (int i = 0; i < 32; i++){
+    output[i] = sensorWhite[i];
+  }
+}
+
+int getSensitivity(){
+  return sensitivity;
+}
+
 int getFirstWhiteAngle() { return firstWhiteAngle; }
 bool getFirstWhite()     { return firstWhite; }
 bool whiteDetected()     { return touchWhite; }

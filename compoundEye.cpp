@@ -3,7 +3,7 @@
 const int eyeNum = 18;
 
 // Thresholds for mapping analog port values to eye sectors (0–17)
-int eyePortThres[eyeNum] = { 32, 63, 94, 125, 157, 188, 220, 254, 285, 317, 338, 374, 405, 436, 467, 493, 525, 555};
+int eyePortThres[eyeNum] = { 32, 64, 95, 127, 158, 190, 222, 253, 285, 317, 347, 380, 410, 442, 474, 499, 531, 562};
 //                           0   20  40  60   80   100  120  140  160  180  200  220  240  260  280  300  320  340
 // --- Setup ---
 
@@ -38,11 +38,11 @@ int getEyeAngle() {
   int frontAngle = analogRead(A3);  // Front IR sensor
   if (frontAngle > 60 && frontAngle < 180) {
     if (frontAngle < 100) {
-      degree = 10;
+      degree = 350;
     } else if (frontAngle < 130) {
       degree = 0;
     } else {
-      degree = 350;
+      degree = 10;
     }
   }
 

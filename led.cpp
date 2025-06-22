@@ -64,7 +64,7 @@ void clearLEDState() {
 
 // Automatically control LED indicators based on game state
 void checkLED() {
-  setLEDState(4, getKickoff() ? ON : OFF);          // LED 4 for kickoff
+  // setLEDState(4, getKickoff() ? ON : OFF);          // LED 4 for kickoff
   setLEDState(0, whiteDetected() ? ON : OFF);       // LED 0 for white line detection
   // Additional indicators can be added here
 }

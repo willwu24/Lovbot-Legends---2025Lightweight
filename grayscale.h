@@ -65,4 +65,8 @@ double getXSum();
 double getYSum();
 bool getInCorner();
 
+void getWhiteSensor(bool output[32]);
+
+int getSensitivity();
+
 #endif // GRAYSCALE_H

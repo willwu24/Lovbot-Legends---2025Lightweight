@@ -1,8 +1,8 @@
  #include "GoToBall.h"
 //can't go over
 //SPEED PID
-int minGoToBallSpeed = 30;//40
-int maxGoToBallSpeed = 50;//16, 36//36-->46
+int minGoToBallSpeed = 30;//30
+int maxGoToBallSpeed = 40;//16, 36//36-->46   50
 int speedDiff = maxGoToBallSpeed-minGoToBallSpeed;
 
 //DIRECTION PID

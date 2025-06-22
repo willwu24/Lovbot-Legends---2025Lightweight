@@ -1,73 +1,94 @@
 #include "button.h"
 #include "player.h"
 
-const int TOTAL = 5;
-const int TOTAL_STATE = 2;
+const int TOTAL        = 5;      // number of buttons
+const int TOTAL_STATE  = 2;      // for your 0/1 toggle
+const unsigned long LONG_PRESS_MS = 100;  // adjust to taste
+bool scanning = false;
+bool prevButton = false;
 
-int buttonState[TOTAL] = {0};
-int buttonP[TOTAL] = {0};  // Tracks if button is pressed
-int previousButtonPressed[TOTAL] = {0};
-bool longPressed[TOTAL] = {0};
+/* -------------- internal state ---------------- */
+int  buttonState[TOTAL]            = {0};   // your old toggle
+int  previousButtonPressed[TOTAL]  = {0};   // last raw level
+bool longPressed[TOTAL]            = {0};   // long-press flags
 
-// Update all button states
-void updateButton() {
-  for (int i = 0; i < TOTAL; i++) {
-    buttonP[i] = !digitalRead(BUTTON_PIN[i]);
-    if (buttonP[i] == 1 && previousButtonPressed[i] == 0) {
+unsigned long pressStart[TOTAL]    = {0};   // millis() when press began
+
+/* ----------- update all buttons (call every loop) --------------- */
+void updateButton()
+{
+  for (int i = 0; i < TOTAL; ++i)
+  {
+    /* active-LOW: pressed = 1, released = 0 */
+    int pressedNow = !digitalRead(BUTTON_PIN[i]);
+
+    /* rising edge → remember the timestamp */
+    if (pressedNow == 1 && previousButtonPressed[i] == 0)
+    {
+      pressStart[i] = millis();
+    }
+
+    /* if held long enough, set long-press flag */
+    if (pressedNow == 1 &&
+        (millis() - pressStart[i]) >= LONG_PRESS_MS)
+    {
+      longPressed[i] = true;
+    }
+    else if (pressedNow == 0)              // released → clear flag
+    {
+      longPressed[i] = false;
+      pressStart[i]  = 0;
+    }
+
+    /* keep your original 0/1 toggle logic */
+    if (pressedNow == 1 && previousButtonPressed[i] == 0)
+    {
       buttonState[i] = (buttonState[i] + 1) % TOTAL_STATE;
     }
-    previousButtonPressed[i] = buttonP[i];
+
+    previousButtonPressed[i] = pressedNow;
   }
 }
 
-// Returns true if a specific button is currently pressed
-bool buttonPressed(int which) {
-  return !digitalRead(BUTTON_PIN[which]);
+/* ------------- public helpers ----------------- */
+bool buttonPressed(int which)        { return longPressed[which]; }
+bool getButtonState(int which)       { return buttonState[which]; }
+bool buttonLongPressed(int which)    { return longPressed[which]; }
+
+void clearButtonState()
+{
+  for (int i = 0; i < TOTAL; ++i) buttonState[i] = 0;
 }
 
-// Returns the toggled state of a specific button
-bool getButtonState(int which) {
-  return buttonState[which];
-}
-
-// Returns whether a button has been long pressed (not currently implemented)
-bool buttonLongPressed(int which) {
-  return longPressed[which];
-}
-
-// Resets all button states to 0
-void clearButtonState() {
-  for (int i = 0; i < TOTAL; i++) {
-    buttonState[i] = 0;
+/* ------------- one-time setup ----------------- */
+void setupButton()
+{
+  for (int i = 0; i < TOTAL; ++i)
+  {
+    pinMode(BUTTON_PIN[i], INPUT_PULLUP);   // stable HIGH when idle
   }
 }
 
-// Initializes all buttons as inputs
-void setupButton() {
-  for (int i = 0; i < TOTAL; i++) {
-    pinMode(BUTTON_PIN[i], INPUT);
+/* ------------- example actions ---------------- */
+void checkButton()
+{
+
+  /* Hold button 3 for >500 ms to toggle attack mode */
+  // if (buttonPressed(3))
+  // {
+  //   setAttackMode(getAttackMode() == YELLOW ? BLUE : YELLOW);
+  // }
+  // setLEDState(3, getAttackMode() == YELLOW ? 1 : 0);
+
+  /* Hold button 2 for >500 ms to calibrate */
+  if (buttonPressed(3)&&!prevButton)
+  {
+    scanning = !scanning;
   }
-}
-
-// Example use case: checks buttons for specific actions
-void checkButton() {
-  // Toggle attack mode with button 3
-  if (buttonPressed(3)) {
-    if (getAttackMode() == YELLOW) {
-      setAttackMode(BLUE);
-    } else {
-      setAttackMode(YELLOW);
-    }
-  }
-
-  // Reflect attack mode using LED 3
-  setLEDState(3, getAttackMode() == YELLOW ? 1 : 0);
-
-  // Calibrate threshold with button 2
-  if (buttonPressed(2)) {
-    setLEDState(2, 1);
+  if(scanning){
+    Serial.println("calibrating threshold");
     calibrateThreshold();
-  } else {
-    setLEDState(2, 0);
   }
+  setLEDState(3, scanning ? 1:0);
+  prevButton = buttonPressed(3);
 }

@@ -16,7 +16,8 @@
 
 
 void setup() {
-
+  setSerialMonitor(); 
+  Serial.print("Start");
   setupButton();
 
   while(!buttonPressed(4)) //Press button 5 to start the program
@@ -27,11 +28,11 @@ void setup() {
   setLEDState(4,1);
 
   Serial.println("Running basic setup...");
-  setSerialMonitor(); 
   setBotNum(1);
   setupMotors();
 
   Serial.println("Setting up sensors...");
+  
   setupKicker();
   setupCamera();
   setupCompass();
@@ -39,7 +40,8 @@ void setup() {
   initSensors();
   eyeSetup();
   setUpBallPID();
-  
+  displaySetup();
+
   Serial.println("Finished setup.");
 }
 

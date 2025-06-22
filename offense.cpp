@@ -43,6 +43,7 @@ void offenseMain() {
   else {
     if (hasBall()){
       goToBallPID();
+      //kick();
     }
     else if (getEyeValue() < 12){
       setDir(STOP);
