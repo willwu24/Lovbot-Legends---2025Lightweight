@@ -15,7 +15,7 @@ void player() {
   Serial.print("Player");
   // === Initialization ===
   setAttackMode(YELLOW);     // Set goal to shoot on
-  setRobotRole(DEFENSE);     // Set initial role
+  setRobotRole(OFFENSE);     // Set initial role
   setupVariables();
   // while(1){
   //   setMotors(20,20,20,20);
@@ -44,16 +44,16 @@ void player() {
     } else {
       defenseMain();
     }
-
+    //goToCoordinate(0, 0);
     // === Actuation ===
     move();
 
     // === Debugging ===
-    // Serial.print("Dir: ");
-    // Serial.print(getDir());
-    // Serial.print(" Speed: ");
-    // Serial.println(getSpeed());
-    Serial.println(getHomeAngle());
+    Serial.print("Eye Angle: ");
+    Serial.print(getEyeAngle());
+    Serial.print(" Speed: ");
+    Serial.println(getSpeed());
+    //Serial.println(getHomeAngle());
 
     // Additional debug (uncomment to use):
     //displayCamera();
@@ -61,7 +61,7 @@ void player() {
     //displayCompass();
     // printSensorsReading();
     // printSensorsWhite();
-    // Serial.println(getLaser());
+    // Serial.println(analogRead(LAZER_PIN));
     // Serial.println(getYellowAngle());
     // Serial.println(getCompass());
     // Serial.println(hasBall());

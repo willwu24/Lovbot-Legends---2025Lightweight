@@ -5,7 +5,7 @@ int minSpeed = 20;
 int maxSpeed = 40;
 
 // Parking parameters
-int parkThresholdDist = 10;
+int parkThresholdDist = 40;
 int parkThresholdTime = 200;
 bool parking = false;
 unsigned long confirmParkTime = -1;
@@ -25,16 +25,13 @@ posInfo targetCoordinates;
 // Time tracking
 unsigned long currTime = millis();
 
-void setupCoordinateMovement() {
-  getNextCORandom();
-}
-
-void backPositionDefense() {
+void goToCoordinate(int tarX, int tarY){
   currTime = millis();
   posInfo currCO = getCurrPosition();
   moveInfo currMove;
-  setTargetCO();
-  posInfo targetCO = {defensePark[0], defensePark[1]};
+  posInfo targetCO;
+  targetCO.posX = tarX;
+  targetCO.posY = tarY;
 
   if ((getSpeed() < 5 || getDir() == 360) && parking) {
     return;
@@ -44,31 +41,7 @@ void backPositionDefense() {
     parking = false;
     parkedTime = -1;
     currMove = blockedCalculator(currCO, targetCO);
-  } else {
-    parkedTime = -1;
-    currMove.dist = distCalculator(currCO, targetCO);
-    currMove.dir = dirCalculator(currCO, targetCO);
-  }
-
-  setDir(currMove.dir);
-  setSpeed(speedCalculator(currMove.dist));
-}
-
-void moveToCoordinate() {
-  currTime = millis();
-  posInfo currCO = getCurrPosition();
-  moveInfo currMove;
-  setTargetCO();
-  posInfo targetCO = targetCoordinates;
-
-  if ((getSpeed() < 5 || getDir() == 360) && parking) {
-    return;
-  }
-
-  if (currCO.isXBlocked || currCO.isYBlocked) {
-    parking = false;
-    parkedTime = -1;
-    currMove = blockedCalculator(currCO, targetCO);
+    Serial.print("Blocked");
   } else {
     parkedTime = -1;
     currMove.dist = distCalculator(currCO, targetCO);
@@ -78,21 +51,6 @@ void moveToCoordinate() {
   setDir(currMove.dir);
   setSpeed(speedCalculator(currMove.dist));
   setTarget(0);
-}
-
-void cornerPark() {
-  int smallSide = min(getUltraLeft(), getUltraRight());
-
-  if (abs(getUltraFront() - 75) < 10 && abs(smallSide - 30)) {
-    setDir(STOP);
-  } else {
-    setDir(toDegree(atan2(smallSide - 30, getUltraFront() - 75)));
-  }
-
-  if (getDir() < 0) setDir(getDir() + 360);
-  if (getXBlocked()) setDir(180);
-
-  setSpeed(10 + abs(getUltraFront() - 75) * 0.4);
 }
 
 bool isParked(int dist) {
@@ -138,32 +96,4 @@ moveInfo blockedCalculator(posInfo currCO, posInfo targetCO) {
     move.dir = 360;
   }
   return move;
-}
-
-bool changeLocation() {
-  if (parkedTime == -1) {
-    parkedTime = currTime;
-  } else if (currTime - parkedTime > waitMoveTime) {
-    return true;
-  }
-  return false;
-}
-
-void getNextCO() {
-  currentSpot = (currentSpot + 1) % NUM_OF_PARKING_AREAS;
-  targetCoordinates.posX = parkingArea[currentSpot][0];
-  targetCoordinates.posY = parkingArea[currentSpot][1];
-}
-
-void setNeutralSpot() {
-  currentSpot = 1;
-}
-
-void setCenter() {
-  currentSpot = 0;
-}
-
-void setTargetCO() {
-  targetCoordinates.posX = parkingArea[0][0];
-  targetCoordinates.posY = parkingArea[0][1];
 }

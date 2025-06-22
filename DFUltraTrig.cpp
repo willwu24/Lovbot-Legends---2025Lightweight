@@ -8,6 +8,8 @@
 // Ultrasonic pins:      Front, Right, Back, Left
 int trigechoPin[ULTRA_NUM] = {A9, A13, A8, A12};
 
+int pastReadings[5] = {0,0,0,0};
+
 uint16_t distance;
 uint32_t pulseWidthUs;
 
@@ -51,6 +53,14 @@ int getUltra(int which) {
 }
 
 int getUltraFront() { return analogRead(trigechoPin[0]); }
-int getUltraRight() { return analogRead(trigechoPin[1]); }
+int getUltraRight() { 
+  // int maxVal;
+  // for (int i = 0; i < 4; ++i) {
+  //   if (pastReadings[i] > maxVal) {
+  //     maxVal = lastReadings[which][i];
+  //   }
+  // }
+  return analogRead(trigechoPin[1]); 
+}
 int getUltraBack() { return analogRead(trigechoPin[2]); }
 int getUltraLeft() { return analogRead(trigechoPin[3]); }

@@ -75,8 +75,8 @@ posInfo findCOByCenter(int front, int right, int back, int left) {
 }
 
 // --- Obstruction Detection ---
-bool isXBlocked(int left, int right)  { return (left + right) < 0; }  // H threshold
-bool isYBlocked(int front, int back)  { return (front + back) < 0; }  // V threshold
+bool isXBlocked(int left, int right)  { return (left + right) < thresHoldh; }  // H threshold
+bool isYBlocked(int front, int back)  { return (front + back) < thresHoldv; }  // V threshold
 
 // --- Accessor Functions ---
 int getX()            { return currPosition.posX; }

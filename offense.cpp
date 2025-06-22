@@ -41,12 +41,12 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    if (hasBall()){
+    if (0){//(hasBall()){
       goToBallPID();
       //kick();
     }
     else if (getEyeValue() < 12){
-      setDir(STOP);
+      goToCoordinate(0, 0);
     }
     else
     {
