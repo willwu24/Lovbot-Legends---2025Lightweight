@@ -67,4 +67,5 @@ void checkLED() {
   // setLEDState(4, getKickoff() ? ON : OFF);          // LED 4 for kickoff
   setLEDState(0, whiteDetected() ? ON : OFF);       // LED 0 for white line detection
   // Additional indicators can be added here
+  setLEDState(2, getAttackMode()==YELLOW ? ON : OFF);
 }

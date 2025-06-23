@@ -15,7 +15,7 @@ void player() {
   Serial.print("Player");
   // === Initialization ===
   setAttackMode(YELLOW);     // Set goal to shoot on
-  setRobotRole(OFFENSE);     // Set initial role
+  setRobotRole(DEFENSE);     // Set initial role
   setupVariables();
   // while(1){
   //   setMotors(20,20,20,20);
