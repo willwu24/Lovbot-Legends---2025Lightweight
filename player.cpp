@@ -40,7 +40,9 @@ void player() {
 
     // === Role Handling ===
     if (getRobotRole() == OFFENSE) {
+      // goToBallPID();
       offenseMain();
+      // Serial.println(hasBall());
     } else {
       defenseMain();
     }
@@ -49,11 +51,7 @@ void player() {
     move();
 
     // === Debugging ===
-    Serial.print("Eye Angle: ");
-    Serial.print(getEyeAngle());
-    Serial.print(" Speed: ");
-    Serial.println(getSpeed());
-    //Serial.println(getHomeAngle());
+
 
     // Additional debug (uncomment to use):
     //displayCamera();

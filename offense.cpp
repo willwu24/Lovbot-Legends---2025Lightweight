@@ -9,17 +9,24 @@ int lastWhiteAngle = 0;
 int lastTarget = 0;
 int firstBall = 0;
 
+int frontStart = 200, frontHard = 0;
+int backStart  = 200, backHard  = 100;
+int leftStart  = 200, leftHard  = 50;
+int rightStart = 200, rightHard = 50;
+
+bool turnSet = false;
+
 unsigned long lastHasBall = -1;
 
 // === Main Offense Control ===
 void offenseMain() {
   retrieveKicker();
-  setTarget(0);
   setTurningMode(1);
-  setAngleThres(30);
+  setAngleThres(35);
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
+    setTarget(0);
     setMotorMode(0);
     resetBallPID();
 
@@ -31,8 +38,8 @@ void offenseMain() {
   }
 
   // === Recently Detected White Line ===
-  else if ((millis() - lastWhite < 100 && !getFlip()) ||
-           (millis() - lastWhite < 2000 && getFlip())) {
+  else if ((millis() - lastWhite < 50 && !getFlip()) ||
+           (millis() - lastWhite < 1000 && getFlip())) {
     Serial.println("Running White Line 50ms");
 
     resetBallPID();
@@ -41,16 +48,33 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    if (0){//(hasBall()){
+    if (hasBall()){
+      if (!turnSet && getUltraFront() < 200){
+        if (getUltraLeft() < getUltraRight()){
+          setTarget(45);
+          turnSet = true;
+        }
+        else
+        {
+          setTarget(315);
+          turnSet = true;
+        }
+      }
       goToBallPID();
-      //kick();
+      applyAirWall();
+      // kick();
     }
     else if (getEyeValue() < 12){
+      turnSet = false;
+      setTarget(0);
       goToCoordinate(0, 0);
     }
     else
     {
+      turnSet = false;
+      setTarget(0);
       goToBallPID();
+      applyAirWall();
     }
   }
 }
@@ -67,4 +91,78 @@ void grabBall() {
       setMotors(30, 30, 20, 20);
     }
   }
+}
+
+double calculateRepelEffect(int distance, int startThreshold, int hardThreshold) {
+    return constrain((startThreshold - distance) / (double)(startThreshold - hardThreshold), 0.0, 1.0);
+}
+
+double calculateRepelEffect(int distance, int startThreshold, int hardThreshold, double ratio) {
+    return ratio * constrain((startThreshold - distance) / (double)(startThreshold - hardThreshold), 0.0, 1.0);
+}
+
+void applyAirWall(){
+  int ultraL = getUltraLeft();
+  int ultraR = getUltraRight();
+  int ultraF = getUltraFront();
+  int ultraB = getUltraBack();
+
+  int dir = getDir();
+  int speed = getSpeed();
+
+  double repelX = 0.0;
+  double repelY = 0.0;
+
+  if (getDir() > 90 && getDir() <270){
+    repelY += calculateRepelEffect(ultraB, backStart, backHard);
+  }
+  else
+  {
+    // repelY -= calculateRepelEffect(ultraF, frontStart, frontHard, 0.5);
+  }
+
+  if (getDir() > 180){
+    repelX += calculateRepelEffect(ultraL, leftStart, leftHard);
+  }
+  else
+  {
+    repelX -= calculateRepelEffect(ultraR, rightStart, rightHard);
+  }
+
+  double repelMag = sqrt(repelX * repelX + repelY * repelY);
+
+  Serial.print("RepelX: "); Serial.print(repelX);
+  Serial.print("  RepelY: "); Serial.print(repelY);
+  Serial.print("  Magnitude: "); Serial.print(repelMag);
+
+  int currDir = getDir();    // 0–359
+  int currSpeed = getSpeed(); // Magnitude
+
+  double angleRad = (90 - currDir) * M_PI / 180.0;
+  double x = cos(angleRad) * currSpeed;
+  double y = sin(angleRad) * currSpeed;
+
+  Serial.print("X: "); Serial.print(x);
+  Serial.print("  Y: "); Serial.print(y);
+
+  const double MAX_REPEL_FORCE = 50.0; // You can tune this value
+  x += repelX * MAX_REPEL_FORCE;
+  y += repelY * MAX_REPEL_FORCE;
+
+  // Step 4: Convert back to polar coordinates
+  double combinedMag = sqrt(x * x + y * y);
+  int newSpeed = (int)combinedMag;
+  int newDir = 360; // default STOP
+
+  if (combinedMag > 0.01) {
+    double combinedAngle = atan2(y, x);
+    newDir = ((int)(90 - combinedAngle * 180.0 / M_PI + 360)) % 360;
+  }
+
+  // Step 5: Apply or print
+  setSpeed(newSpeed);
+  setDir(newDir);
+
+  Serial.print("  NewDir: "); Serial.print(newDir);
+  Serial.print("  NewSpeed: "); Serial.println(newSpeed);
 }
