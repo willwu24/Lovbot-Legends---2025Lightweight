@@ -40,9 +40,9 @@ void player() {
 
     // === Role Handling ===
     if (getRobotRole() == OFFENSE) {
-      goToBallPID();
-      applyAirWall();
-      // offenseMain();
+      // goToBallPID();
+      offenseMain();
+      // Serial.println(hasBall());
     } else {
       defenseMain();
     }

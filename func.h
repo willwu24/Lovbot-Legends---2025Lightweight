@@ -24,7 +24,7 @@ static posInfo currPosition;
 
 // -------------------------- Constants & Macros --------------------------
 
-#define MOVE_CORRECTION_RATIO 0.5
+#define MOVE_CORRECTION_RATIO 0.3
 
 #define OFF     0
 #define ON      1
@@ -68,10 +68,10 @@ const int thresHoldv = V_SIZE-toleranceV;
 
 // -------------------------- Pin Configuration --------------------------
 
-static const int LAZER_PIN       = A7;
-static const int SHOOT_PIN       = A6;
+static const int LAZER_PIN       = A6;
+static const int SHOOT_PIN       = A7;
 static const int BUTTON_PIN[]    = {10, 11, 12, 30, 31};
-static const int DRIBBLER_PIN_1  = A9;
+// static const int DRIBBLER_PIN_1  = A9;
 
 #define TCAADDR 0x70  // I2C Multiplexer Address
 

@@ -13,12 +13,12 @@ long lastSwitchOnTime = -switchOffReactionTime;
 
 Servo ESC;
 
-void setupDribbler() {
-  Serial.println("Setting up dribbler...");
-  ESC.attach(DRIBBLER_PIN_1); // Attach ESC to specified pin
-  ESC.write(30);              // Initial speed pulse to activate ESC
-  delay(1000);                // Give time for ESC to initialize
-}
+// void setupDribbler() {
+//   Serial.println("Setting up dribbler...");
+//   ESC.attach(DRIBBLER_PIN_1); // Attach ESC to specified pin
+//   ESC.write(30);              // Initial speed pulse to activate ESC
+//   delay(1000);                // Give time for ESC to initialize
+// }
 
 void setDribbler(int speed, int status) {
   ESC.write(speed);
