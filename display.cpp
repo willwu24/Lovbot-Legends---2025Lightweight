@@ -65,6 +65,7 @@ void displayUpdate()
   bool forceRefresh = page>0;
   if(page!=lastPage || currentAttackMode!=lastAttackMode || forceRefresh)
   {
+    Serial.print("refresh");
     oled.clearDisplay();
     switch(page){
       case 0: titleBar("HOME"   ); drawHome();    break;

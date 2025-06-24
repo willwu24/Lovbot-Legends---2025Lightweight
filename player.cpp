@@ -59,9 +59,9 @@ void player() {
     //displayCompass();
     // printSensorsReading();
     // printSensorsWhite();
-    // Serial.println(analogRead(LAZER_PIN));
+    Serial.println(getUltraFrontCM());
     // Serial.println(getYellowAngle());
-    // Serial.println(getCompass());
-    // Serial.println(hasBall());
+    // Serial.println((Serial7.available()));
+    // Serial.println(getHomeAngle());
   }
 }

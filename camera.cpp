@@ -9,13 +9,13 @@ byte tempData[10];
 byte data[10];
 
 void setupCamera() {
-  Serial7.begin(57600);
+  Serial7.begin(57600);//57600
 }
 
 void getCameraData() {
   const unsigned long timeoutThreshold = 500;
   static unsigned long lastReceivedDataTime = 0;
-
+  //Serial.println(Serial7.available());
   if (Serial7.available() >= 12) {
     byte header = Serial7.read();
     if (header == 0x99) {

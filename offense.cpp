@@ -10,9 +10,9 @@ int lastTarget = 0;
 int firstBall = 0;
 
 int frontStart = 200, frontHard = 0;
-int backStart  = 200, backHard  = 100;
-int leftStart  = 200, leftHard  = 50;
-int rightStart = 200, rightHard = 50;
+int backStart  = 100, backHard  = 50;
+int leftStart  = 100, leftHard  = 25;
+int rightStart = 100, rightHard = 25;
 
 bool turnSet = false;
 
@@ -35,6 +35,7 @@ void offenseMain() {
     lastWhiteAngle = dirAngle;
 
     setDir(dirAngle);
+    setSpeed(max(10, getSpeed()));
   }
 
   // === Recently Detected White Line ===
@@ -48,7 +49,7 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    if (hasBall()){
+    if (0){//(hasBall()){
       if (!turnSet && getUltraFront() < 200){
         if (getUltraLeft() < getUltraRight()){
           setTarget(45);

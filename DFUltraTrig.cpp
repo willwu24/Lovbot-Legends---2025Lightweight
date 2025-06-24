@@ -52,20 +52,33 @@ int getUltra(int which) {
   return ultraReadings[which];
 }
 
-// int getUltraFront() { return analogRead(trigechoPin[0]); }
-// int getUltraRight() { 
-//   // int maxVal;
-//   // for (int i = 0; i < 4; ++i) {
-//   //   if (pastReadings[i] > maxVal) {
-//   //     maxVal = lastReadings[which][i];
-//   //   }
-//   // }
-//   return analogRead(trigechoPin[1]); 
-// }
-// int getUltraBack() { return analogRead(trigechoPin[2]); }
-// int getUltraLeft() { return analogRead(trigechoPin[3]); }
+int getUltraFront() { return analogRead(trigechoPin[0]); }
+int getUltraRight() { 
+  // int maxVal;
+  // for (int i = 0; i < 4; ++i) {
+  //   if (pastReadings[i] > maxVal) {
+  //     maxVal = lastReadings[which][i];
+  //   }
+  // }
+  return analogRead(trigechoPin[1]); 
+}
+int getUltraBack() { return analogRead(trigechoPin[2]); }
+int getUltraLeft() { return analogRead(trigechoPin[3]); }
 
-int getUltraFront() { return getUltra(0); }
-int getUltraRight() { return getUltra(1); }
-int getUltraBack()  { return getUltra(2); }
-int getUltraLeft()  { return getUltra(3); }
+int getUltraFrontCM() { return analogRead(trigechoPin[0])*0.427304-4.43738; }
+int getUltraRightCM() { 
+  // int maxVal;
+  // for (int i = 0; i < 4; ++i) {
+  //   if (pastReadings[i] > maxVal) {
+  //     maxVal = lastReadings[which][i];
+  //   }
+  // }
+  return analogRead(trigechoPin[1])*0.427304-4.43738; 
+}
+int getUltraBackCM() { return analogRead(trigechoPin[2])*0.427304-4.43738; }
+int getUltraLeftCM() { return analogRead(trigechoPin[3])*0.427304-4.43738; }
+
+// int getUltraFront() { return getUltra(0); }
+// int getUltraRight() { return getUltra(1); }
+// int getUltraBack()  { return getUltra(2); }
+// int getUltraLeft()  { return getUltra(3); }

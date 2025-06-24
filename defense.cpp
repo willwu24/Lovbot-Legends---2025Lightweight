@@ -50,11 +50,11 @@ void defenseMain(){
   retrieveKicker();
   setAngleThres(25);
   setTarget(0);
-  setMotorMode(1);
+  //setMotorMode(1);
   if(homeDetected()){
     lastGoalAngle = getHomeAngle();
   }
-  if(hasBall()){
+  if(0){//(hasBall()){
     Serial.print("HAS BALL");
 
     firstGettingBall=-1;
@@ -65,8 +65,8 @@ void defenseMain(){
     if(firstHasBall==-1){
       firstHasBall = millis();
     }
-    else if(millis()-firstHasBall>100&&getUltraFront()>20){
-      kick();
+    else if(millis()-firstHasBall>100&&getUltraFrontCM()>20){
+      //kick();
       firstHasBall = -1;
     }
   }
@@ -78,7 +78,7 @@ void defenseMain(){
     if(firstGettingBall==-1){
       firstGettingBall = millis();
     }
-    else if(millis()-firstGettingBall>2000||getUltraBack()>70){//went for too long, go back now
+    else if(millis()-firstGettingBall>2000||getUltraBackCM()>70){//went for too long, go back now
       gettingBall=false;
       firstGettingBall = -1;
     }
@@ -97,13 +97,14 @@ void defenseMain(){
     prevWhiteDetected = -1;
     defenseSpeedOffset = constrain(defenseSpeedOffset,5,40);
     setSpeed(defenseSpeedOffset);
-    if(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())<5&&homeDetected()){
-      setSpeed(30);
-      if(getUltraBack()>24){
+    if(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())<5&&homeDetected()&&(abs(getAngleDif(90, getWhiteAngle()))<10||abs(getAngleDif(270, getWhiteAngle()))<10)){
+      if(getUltraBackCM()>30){//TUNE
         setDir(getHomeAngle());
+        setSpeed(30);
       }
       else{
         setDir(0);
+        setSpeed(15);
       }
     }
     else if(!homeDetected()){
@@ -135,7 +136,7 @@ void defenseMain(){
     gettingBall = false;
     firstHasBall = -1;
     if(homeDetected()&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>15||(getHomeDistance()>40&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>3)){
-      if(getUltraBack()<25){
+      if(getUltraBackCM()<25){
         setSpeed(30);
         if(getEyeValue()<12){
           int ballAngle = getEyeAngle();
@@ -192,7 +193,7 @@ void whiteMove(int dir){
   double offset = 0;
   if (dir != 360)
   {
-    offset = magnitude* 25.0;
+    offset = magnitude* 15.0;//TUNE 25.0
   }
 
   if (dir > 180){
@@ -232,7 +233,7 @@ int getDefenseDir(){
   }
 
   double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;
-  angleRatio = constrain(angleRatio, 0.2,1.0);
+  angleRatio = constrain(angleRatio, 0.1,1.0);
 
   double distRatio = getEyeValue()/300.0;
   distRatio = constrain(distRatio,0.3,1.0);

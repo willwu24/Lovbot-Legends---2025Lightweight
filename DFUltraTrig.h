@@ -13,5 +13,9 @@ int getUltraFront();
 int getUltraLeft();
 int getUltraBack();
 int getUltraRight();
+int getUltraFrontCM();
+int getUltraLeftCM();
+int getUltraBackCM();
+int getUltraRightCM();
 
 #endif  // DFULTRATRIG_H
