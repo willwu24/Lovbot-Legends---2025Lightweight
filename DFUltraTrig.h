@@ -18,4 +18,6 @@ int getUltraLeftCM();
 int getUltraBackCM();
 int getUltraRightCM();
 
+double getAdjustedRightDistance();
+
 #endif  // DFULTRATRIG_H

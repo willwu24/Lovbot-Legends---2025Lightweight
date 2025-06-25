@@ -1,8 +1,8 @@
  #include "GoToBall.h"
 //can't go over
 //SPEED PID
-int minGoToBallSpeed = 35;//30
-int maxGoToBallSpeed = 45;//16, 36//36-->46   50
+int minGoToBallSpeed = 40;//30
+int maxGoToBallSpeed = 50;//16, 36//36-->46   50
 int speedDiff = maxGoToBallSpeed-minGoToBallSpeed;
 
 //DIRECTION PID
@@ -13,8 +13,8 @@ int dirDiff = maxDir - minDir;
 //---------------------------------------//
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
-double speedKp=0.15, speedKi=0.001, speedKd=0.001;// 0.74
-double dirKp=0.31, dirKi=0.00, dirKd=0.005;//0.01, 0.3, 0.004,                  0.24
+double speedKp=0.21, speedKi=0.001, speedKd=0.001;// 0.74
+double dirKp=0.32, dirKi=0.00, dirKd=0.005;//0.01, 0.3, 0.004,                  0.24
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
@@ -32,12 +32,12 @@ PID dirPID(&ballDist, &distanceRatio, &ballFarthest, dirKp, dirKi, dirKd, REVERS
 void setUpBallPID(){
     // Adjust initial closest distance according to new range
     if (getBotNum==0){
-      ballClosest = 750;
+      ballClosest = 350;
     }
     else{
-      ballClosest = 750; // Make sure to test this//250
+      ballClosest = 350; // Make sure to test this//250
     }
-    ballFarthest = 15;
+    ballFarthest = 12;
 
     speedPID.SetOutputLimits(PIDMinimum, PIDMaximum);
     speedPID.SetMode(AUTOMATIC);
