@@ -24,7 +24,7 @@ static posInfo currPosition;
 
 // -------------------------- Constants & Macros --------------------------
 
-#define MOVE_CORRECTION_RATIO 0.3
+#define MOVE_CORRECTION_RATIO 0.25
 
 #define OFF     0
 #define ON      1

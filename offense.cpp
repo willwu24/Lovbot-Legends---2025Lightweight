@@ -9,10 +9,10 @@ int lastWhiteAngle = 0;
 int lastTarget = 0;
 int firstBall = 0;
 
-int frontStart = 200, frontHard = 0;
-int backStart  = 100, backHard  = 50;
-int leftStart  = 100, leftHard  = 25;
-int rightStart = 100, rightHard = 25;
+int frontStart = 100, frontHard = 0;
+int backStart  = 200, backHard  = 50;
+int leftStart  = 200, leftHard  = 50;
+int rightStart = 200, rightHard = 50;
 
 bool turnSet = false;
 
@@ -22,10 +22,11 @@ unsigned long lastHasBall = -1;
 void offenseMain() {
   retrieveKicker();
   setTurningMode(1);
-  setAngleThres(35);
+  setAngleThres(40);
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
+    turnSet = false;
     setTarget(0);
     setMotorMode(0);
     resetBallPID();
@@ -35,11 +36,17 @@ void offenseMain() {
     lastWhiteAngle = dirAngle;
 
     setDir(dirAngle);
-    setSpeed(max(10, getSpeed()));
+    if (!getFlip()){
+      setSpeed(30);
+    }
+    else
+    {
+      setSpeed(35);
+    }
   }
 
   // === Recently Detected White Line ===
-  else if ((millis() - lastWhite < 50 && !getFlip()) ||
+  else if ((millis() - lastWhite < 100 && !getFlip()) ||
            (millis() - lastWhite < 1000 && getFlip())) {
     Serial.println("Running White Line 50ms");
 
@@ -49,18 +56,7 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    if (0){//(hasBall()){
-      if (!turnSet && getUltraFront() < 200){
-        if (getUltraLeft() < getUltraRight()){
-          setTarget(45);
-          turnSet = true;
-        }
-        else
-        {
-          setTarget(315);
-          turnSet = true;
-        }
-      }
+    if(0){
       goToBallPID();
       applyAirWall();
       // kick();
@@ -72,8 +68,30 @@ void offenseMain() {
     }
     else
     {
-      turnSet = false;
       setTarget(0);
+      // if (!turnSet && getEyeValue() > 230 && getUltraFront() < 200 && (abs(getUltraLeft() - getUltraRight())) > 30){
+      //   Serial.print("Turning Condition: ");
+      //   Serial.print(turnSet);
+      //   Serial.print("    ");
+      //   if (getUltraRight() < getUltraLeft() && getUltraRight() < 110 )
+      //   {
+      //     setTarget(350);
+      //     turnSet = true;
+      //   }
+      //   else if (getUltraLeft() < getUltraRight() && getUltraLeft() < 110){
+      //     setTarget(10);
+      //     turnSet = true;
+      //   }
+      //   Serial.println(getTarget());
+      // }
+      // else if (!turnSet){
+      //   setTarget(0);
+      // }
+
+      // if (getEyeValue() < 180){
+      //   turnSet = false;
+      // }
+    
       goToBallPID();
       applyAirWall();
     }
@@ -119,7 +137,7 @@ void applyAirWall(){
   }
   else
   {
-    // repelY -= calculateRepelEffect(ultraF, frontStart, frontHard, 0.5);
+    repelY -= calculateRepelEffect(ultraF, frontStart, frontHard);
   }
 
   if (getDir() > 180){
@@ -132,9 +150,9 @@ void applyAirWall(){
 
   double repelMag = sqrt(repelX * repelX + repelY * repelY);
 
-  Serial.print("RepelX: "); Serial.print(repelX);
-  Serial.print("  RepelY: "); Serial.print(repelY);
-  Serial.print("  Magnitude: "); Serial.print(repelMag);
+  // Serial.print("RepelX: "); Serial.print(repelX);
+  // Serial.print("  RepelY: "); Serial.print(repelY);
+  // Serial.print("  Magnitude: "); Serial.print(repelMag);
 
   int currDir = getDir();    // 0–359
   int currSpeed = getSpeed(); // Magnitude
@@ -143,10 +161,10 @@ void applyAirWall(){
   double x = cos(angleRad) * currSpeed;
   double y = sin(angleRad) * currSpeed;
 
-  Serial.print("X: "); Serial.print(x);
-  Serial.print("  Y: "); Serial.print(y);
+  // Serial.print("X: "); Serial.print(x);
+  // Serial.print("  Y: "); Serial.print(y);
 
-  const double MAX_REPEL_FORCE = 50.0; // You can tune this value
+  const double MAX_REPEL_FORCE = 60.0; // You can tune this value
   x += repelX * MAX_REPEL_FORCE;
   y += repelY * MAX_REPEL_FORCE;
 
@@ -164,6 +182,6 @@ void applyAirWall(){
   setSpeed(newSpeed);
   setDir(newDir);
 
-  Serial.print("  NewDir: "); Serial.print(newDir);
-  Serial.print("  NewSpeed: "); Serial.println(newSpeed);
+  // Serial.print("  NewDir: "); Serial.print(newDir);
+  // Serial.print("  NewSpeed: "); Serial.println(newSpeed);
 }

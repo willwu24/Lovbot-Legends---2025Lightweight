@@ -18,7 +18,7 @@ void eyeSetup();
 int getEyePort();            // Returns active eye port index (0–17)
 int getEyeValue();           // Returns signal value from the active port
 
-// --- Ball Detection Angle ---
+// --- Ball Detection Angle ---x
 int getEyeAngle();           // Returns crude angle to ball (0–360)
 int getEyeAngleSmooth();     // Returns interpolated angle to ball (0–360)
 

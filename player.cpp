@@ -15,7 +15,7 @@ void player() {
   Serial.print("Player");
   // === Initialization ===
   setAttackMode(BLUE);     // Set goal to shoot on
-  setRobotRole(DEFENSE);     // Set initial role
+  setRobotRole(OFFENSE);     // Set initial role
   setupVariables();
   // while(1){
   //   setMotors(20,20,20,20);
@@ -42,7 +42,6 @@ void player() {
     if (getRobotRole() == OFFENSE) {
       // goToBallPID();
       offenseMain();
-      // Serial.println(hasBall());
     } else {
       //goToCoordinate(0,-220);
       defenseMain();
@@ -62,8 +61,6 @@ void player() {
     //displayCompass();
     // printSensorsReading();
     // printSensorsWhite();
-    // Serial.println(getBotNum());
-    // Serial.println((Serial7.available()));
     // Serial.println(getHomeAngle());
   }
 }

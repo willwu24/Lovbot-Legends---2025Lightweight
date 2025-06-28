@@ -41,7 +41,7 @@ void goToCoordinate(int tarX, int tarY){
     parking = false;
     parkedTime = -1;
     currMove = blockedCalculator(currCO, targetCO);
-    Serial.print("Blocked");
+    // Serial.print("Blocked");
   } else {
     parkedTime = -1;
     currMove.dist = distCalculator(currCO, targetCO);
