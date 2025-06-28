@@ -28,7 +28,7 @@ void setup() {
   setLEDState(4,1);
 
   Serial.println("Running basic setup...");
-  setBotNum(0);
+  //setBotNum(1);
   setupMotors();
 
   Serial.println("Setting up sensors...");

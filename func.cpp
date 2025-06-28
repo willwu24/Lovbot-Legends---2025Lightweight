@@ -2,7 +2,7 @@
 
 // PID variables
 
-double motorCorrectionKp = 0.21, motorCorrectionKi = 0.00, motorCorrectionKd = 0.02;
+double motorCorrectionKp = 0.18, motorCorrectionKi = 0.00, motorCorrectionKd = 0.02;
 double motorTurningKp = 0.16, motorTurningKi = 0.00, motorTurningKd = 0.00;
 double motorSetpoint, motorInput, motorCorrectionOutput, motorTurningOutput;
 
@@ -358,5 +358,5 @@ void setTargetMode(int a) { targetMode = a; }
 bool getKickoff() { return kickoff; }
 void setKickoff(bool a) { kickoff = a; }
 
-void setBotNum(int a) { botNum = a; }
-int getBotNum() { return botNum; }
+void setBotNum(int a) { EEPROM.write(32, a); }
+int getBotNum() { return (EEPROM.read(32)); }

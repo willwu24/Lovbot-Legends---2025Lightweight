@@ -14,7 +14,7 @@
 void player() {
   Serial.print("Player");
   // === Initialization ===
-  setAttackMode(YELLOW);     // Set goal to shoot on
+  setAttackMode(BLUE);     // Set goal to shoot on
   setRobotRole(DEFENSE);     // Set initial role
   setupVariables();
   // while(1){
@@ -24,7 +24,7 @@ void player() {
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    displayUpdate();
+    //displayUpdate();
     getCameraData();
     processSensors();
     processWhiteAngle();
@@ -44,7 +44,11 @@ void player() {
       offenseMain();
       // Serial.println(hasBall());
     } else {
+      //goToCoordinate(0,-220);
       defenseMain();
+      // whiteMove(getDefenseDir());
+      // setAngleThres(25);
+      // setSpeed(20);
     }
     //goToCoordinate(0, 0);
     // === Actuation ===
@@ -52,15 +56,13 @@ void player() {
 
     // === Debugging ===
 
-
     // Additional debug (uncomment to use):
     //displayCamera();
     //displayDistance();
     //displayCompass();
     // printSensorsReading();
     // printSensorsWhite();
-    Serial.println(getUltraFrontCM());
-    // Serial.println(getYellowAngle());
+    // Serial.println(getBotNum());
     // Serial.println((Serial7.available()));
     // Serial.println(getHomeAngle());
   }

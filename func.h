@@ -58,8 +58,8 @@ static posInfo currPosition;
 #define STOP       360   // Representation of stop in move()
 #define BLOCKED    361   // Representation of blocked in move()
 
-#define H_SIZE 400  // Horizontal field size (new robot)
-#define V_SIZE 500  // Vertical field size
+#define H_SIZE 450  // Horizontal field size (new robot)
+#define V_SIZE 550  // Vertical field size
 
 const int toleranceH = 100;
 const int toleranceV = 120;//40
@@ -69,7 +69,7 @@ const int thresHoldv = V_SIZE-toleranceV;
 // -------------------------- Pin Configuration --------------------------
 
 static const int LAZER_PIN       = A6;
-static const int SHOOT_PIN       = A7;
+static const int SHOOT_PIN       = A8;
 static const int BUTTON_PIN[]    = {10, 11, 12, 30, 31};
 // static const int DRIBBLER_PIN_1  = A9;
 

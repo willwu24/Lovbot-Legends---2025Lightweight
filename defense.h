@@ -7,6 +7,7 @@
 #include "grayscale.h"
 #include "compoundEye.h"
 #include "dribbler.h"
+#include "player.h"
 
 // --- Defense Module Interface ---
 

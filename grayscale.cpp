@@ -105,7 +105,7 @@ void calibrateThreshold() {
 void getEEPROMThreshold(){
   int testThresholds[32];
   for (int i = 0; i < 32; i++){
-    testThresholds[i] = EEPROM.read(i);
+    testThresholds[i] =EEPROM.read (i);
     sensorThres[i]=testThresholds[i]*2;
   }
 }
