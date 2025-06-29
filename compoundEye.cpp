@@ -38,11 +38,11 @@ int getEyeAngle() {
   int frontAngle = analogRead(A3);  // Front IR sensor
   if (frontAngle > 60 && frontAngle < 180) {
     if (frontAngle < 100) {
-      degree = 350;
+      degree = 10;
     } else if (frontAngle < 130) {
       degree = 0;
     } else {
-      degree = 10;
+      degree = 350;
     }
   }
 
@@ -68,4 +68,20 @@ int getEyeAngleSmooth() {
                    (360.0 - eyePortThres[eyeNum - 1]);
   angle = (eyeNum - 1 + fraction) * (360.0 / eyeNum);
   return (int)angle;
+}
+
+#define EYE_WIN 5  
+
+static int  bufEye[EYE_WIN];
+static int  idxEye  = 0;
+static int  cntEye  = 0;
+
+/* -----------------  public smoothed accessor ------------------- */
+int getEyeValueSmooth()
+{
+    int raw = getEyeValue();                 // original eye sensor reading
+    bufEye[idxEye] = raw;                    // push into ring buffer
+    idxEye = (idxEye + 1) % EYE_WIN;
+    if (cntEye < EYE_WIN) cntEye++;         // ramp-up during first calls
+    return trimmedMean5(bufEye, cntEye);     // spike-free, smoothed value
 }

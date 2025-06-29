@@ -87,18 +87,67 @@ double degToRad(double deg) {
     return deg * PI / 180.0;
 }
 
-double getAdjustedRightDistance() {
-    double hypotenuse = getUltraRight(); // raw reading
-    int compass = getCompass();
-    int sensorAngle = (compass + 90) % 360;  // right sensor points 90° right of heading
-    int angleFromWall = (sensorAngle - 90 + 360) % 360;  // wall is at 90° (East)
 
-    if (angleFromWall > 180) angleFromWall = 360 - angleFromWall;
 
-    double angleRad = toRadian(angleFromWall);
-    return hypotenuse * cos(angleRad);  // X component along wall's normal
+/* ─────────────────────────  USER SETTINGS  ───────────────────────── */
+#define TRIM_WIN 5            // window length (must be 5 here)
+
+/* ─────────────  PER-SENSOR STATE (ring buffers + counters)  ───────── */
+static int  bufFront[TRIM_WIN],  idxFront = 0,  cntFront = 0;
+static int  bufBack [TRIM_WIN],  idxBack  = 0,  cntBack  = 0;
+static int  bufLeft [TRIM_WIN],  idxLeft  = 0,  cntLeft  = 0;
+static int  bufRight[TRIM_WIN],  idxRight = 0,  cntRight = 0;
+
+/* ─────────────  HELPER: trimmed mean of up to 5 ints  ─────────────── */
+static int trimmedMean5(const int *arr, int n)
+{
+    int minV = arr[0], maxV = arr[0], sum = arr[0];
+    for (int i = 1; i < n; ++i) {
+        int v = arr[i];
+        if (v < minV) minV = v;
+        if (v > maxV) maxV = v;
+        sum += v;
+    }
+    if (n < 3)                              // not enough samples yet
+        return sum / n;                     // simple average
+
+    sum -= (minV + maxV);                   // drop extremes
+    return sum / (n - 2);                   // mean of middle 3
 }
 
+/* ─────────────  PUBLIC: SMOOTHED ACCESSORS  ───────────────────────── */
+int getUltraFrontSmooth()
+{
+    int raw = getUltraFront();              // original sensor reading
+    bufFront[idxFront] = raw;
+    idxFront = (idxFront + 1) % TRIM_WIN;
+    if (cntFront < TRIM_WIN) cntFront++;
+    return trimmedMean5(bufFront, cntFront);
+}
 
+int getUltraBackSmooth()
+{
+    int raw = getUltraBack();
+    bufBack[idxBack] = raw;
+    idxBack = (idxBack + 1) % TRIM_WIN;
+    if (cntBack < TRIM_WIN) cntBack++;
+    return trimmedMean5(bufBack, cntBack);
+}
 
+int getUltraLeftSmooth()
+{
+    int raw = getUltraLeft();
+    bufLeft[idxLeft] = raw;
+    idxLeft = (idxLeft + 1) % TRIM_WIN;
+    if (cntLeft < TRIM_WIN) cntLeft++;
+    return trimmedMean5(bufLeft, cntLeft);
+}
 
+int getUltraRightSmooth()
+{
+    int raw = getUltraRight();
+    bufRight[idxRight] = raw;
+    idxRight = (idxRight + 1) % TRIM_WIN;
+    if (cntRight < TRIM_WIN) cntRight++;
+    return trimmedMean5(bufRight, cntRight);
+}

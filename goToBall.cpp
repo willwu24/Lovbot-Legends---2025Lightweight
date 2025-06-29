@@ -14,7 +14,7 @@ int dirDiff = maxDir - minDir;
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
 double speedKp=1.1, speedKi=0.001, speedKd=0.001;// 0.74
-double dirKp=0.33, dirKi=0.00, dirKd=0.005;//0.01, 0.3, 0.004,                  0.24
+double dirKp=0.36, dirKi=0.00, dirKd=0.005;//0.01, 0.3, 0.004,                  0.24
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
@@ -51,7 +51,7 @@ void goToBallPID(){
   //Serial.print("GOING TO BALL ");
   
 	int ballDir = getEyeAngle();
-	ballDist = getEyeValue();
+	ballDist = getEyeValueSmooth();
 
   bool ballBehind = 90 < ballDir && ballDir < 270;
   bool ballRight = ballDir < 180;
@@ -89,7 +89,7 @@ void goToBallPID(){
 
   double finalDirection = ballDir + offset;
   setDir(finalDirection);
-  setSpeed(finalSpeed);
+  setSpeed(45);
 
   if (ballDist < 12) { // Adjust condition for reset based on new range
       resetBallPID();

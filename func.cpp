@@ -320,14 +320,14 @@ bool getLaser() {
 }
 
 bool hasBall() {
-  if (getLaser() && (getEyeAngle() < 40 || getEyeAngle() > 320)) {
+  if (getLaser() && (getEyeAngle() < 60 || getEyeAngle() > 300)) {
     laserCounter++;
     lastLaser = millis();
     return true;
     // if (getBotNum() == 1 || laserCounter > 2) return true;
     // return false;
   } else {
-    if(millis()-lastLaser<10){
+    if(millis()-lastLaser<50){
       return true;
     }
     laserCounter = -1;

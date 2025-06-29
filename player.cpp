@@ -24,7 +24,7 @@ void player() {
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    displayUpdate();
+    // displayUpdate();
     getCameraData();
     processSensors();
     processWhiteAngle();
@@ -40,19 +40,12 @@ void player() {
 
     // === Role Handling ===
     if (getRobotRole() == OFFENSE) {
-      // goToBallPID();
       offenseMain();
     } else {
-      //goToCoordinate(0,-220);
       defenseMain();
-      // setDir(STOP);
-      // whiteMove(getDefenseDir());
-      // setAngleThres(25);
-      // setSpeed(20);
     }
     //goToCoordinate(0, 0);
     // === Actuation ===
-    Serial.print(analogRead(A3));
 
     move();
 

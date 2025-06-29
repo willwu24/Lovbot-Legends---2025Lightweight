@@ -9,14 +9,18 @@ int lastWhiteAngle = 0;
 int lastTarget = 0;
 int firstBall = 0;
 
-int frontStart = 100, frontHard = 75;
-int backStart  = 100, backHard  = 75;
-int leftStart  = 100, leftHard  = 60;
-int rightStart = 100, rightHard = 60;
+int lastHasBall = 0;
+int targetSet = 0;
+int lastTargetSet = 0;
+
+int lastAround = 0;
+
+const int frontStart = 150, frontStop = 0, frontReverse = 0;
+const int backStart = 150, backStop = 60, backReverse = 0;
+const int leftStart = 150, leftStop = 45, leftReverse = 0;
+const int rightStart = 150, rightStop = 45, rightReverse = 0;
 
 bool turnSet = false;
-
-unsigned long lastHasBall = -1;
 
 // === Main Offense Control ===
 void offenseMain() {
@@ -25,8 +29,8 @@ void offenseMain() {
   setAngleThres(40);
 
   // === White Line Detected ===
-  // if (whiteDetected() && firstBall != 1) {
-  if (0){
+  if (whiteDetected() && firstBall != 1) {
+  // if (0){
     turnSet = false;
     setTarget(0);
     setMotorMode(0);
@@ -57,45 +61,53 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
+
     if(hasBall()){
+      lastTargetSet = millis();
+
+      if (millis() - lastAround > 150){
+        kick();
+      }
       goToBallPID();
       applyAirWall();
-      //kick();
-      setSpeed(50);
     }
-    else if (getEyeValue() < 12){
-      turnSet = false;
+    else if (getEyeValueSmooth() < 12){
+      targetSet = 0;
       setTarget(0);
       goToCoordinate(0, 0);
     }
     else
     {
-      setTarget(0);
-      if (!turnSet && getEyeValue() > 230 && getUltraFront() < 200 && (abs(getUltraLeft() - getUltraRight())) > 30){
-        Serial.print("Turning Condition: ");
-        Serial.print(turnSet);
-        Serial.print("    ");
-        if (getUltraRight() < getUltraLeft() && getUltraRight() < 110 )
-        {
-          setTarget(330);
-          turnSet = true;
+      lastAround = millis();
+
+      if (targetSet == 0 && abs(getUltraLeftSmooth() - getUltraRightSmooth()) > 30 && getEyeValue() > 225 && (getEyeAngle() < 90 || getEyeAngle() > 270)){
+        lastTargetSet = millis();
+        if (getUltraLeftSmooth() < getUltraRightSmooth()){
+          targetSet = 1;
         }
-        else if (getUltraLeft() < getUltraRight() && getUltraLeft() < 110){
-          setTarget(30);
-          turnSet = true;
+        else{
+          targetSet = 2;
         }
-        Serial.println(getTarget());
       }
-      else if (!turnSet){
+
+      if (targetSet == 1 && millis() - lastTargetSet < 1000){
+        setTarget(30);
+      }
+      else if (targetSet == 2 && millis() - lastTargetSet < 1000)
+      {
+        setTarget(330);
+      }
+      else{
+        targetSet = 0;
         setTarget(0);
       }
 
-      if (getEyeValue() < 180){
-        turnSet = false;
-      }
+
     
       goToBallPID();
-      applyAirWall();
+      if (targetSet == 0){
+        applyAirWall();
+      }
     }
   }
 }
@@ -114,76 +126,81 @@ void grabBall() {
   }
 }
 
-double calculateRepelEffect(int distance, int startThreshold, int hardThreshold) {
-    return constrain((startThreshold - distance) / (double)(startThreshold - hardThreshold), 0.0, 1.0);
+double calculateRepelEffect(int distance,
+                            int startThreshold,
+                            int stopThreshold,
+                            int reverseThreshold)
+{
+    // Assumes: startThreshold > stopThreshold > reverseThreshold
+    if (distance >= startThreshold) {
+        return 1.0;                                       // full ahead
+    }
+    else if (distance >= stopThreshold) {
+        // +1 → 0   across [start … stop]
+        return (double)(distance - stopThreshold) /
+                       (startThreshold - stopThreshold);
+    }
+    else if (distance >= reverseThreshold) {
+        //  0 → –1  across [stop … reverse]
+        return (double)(distance - stopThreshold) /
+                       (stopThreshold - reverseThreshold);
+    }
+    else {
+        return -1.0;                                      // full reverse
+    }
 }
 
-double calculateRepelEffect(int distance, int startThreshold, int hardThreshold, double ratio) {
-    return ratio * constrain((startThreshold - distance) / (double)(startThreshold - hardThreshold), 0.0, 1.0);
-}
 
-void applyAirWall(){
-  int ultraL = getUltraLeft();
-  int ultraR = getUltraRight();
-  int ultraF = getUltraFront();
-  int ultraB = getUltraBack();
+void applyAirWall()
+{
+    /* 1. Read sensors & current command */
+    int ultraL = getUltraLeftSmooth();
+    int ultraR = getUltraRightSmooth();
+    int ultraF = getUltraFrontSmooth();
+    int ultraB = getUltraBackSmooth();
 
-  int dir = getDir();
-  int speed = getSpeed();
+    int dir   = getDir();     // 0–359  (0 = North, 90 = East)
+    int speed = getSpeed();   // magnitude, same units you use elsewhere
 
-  double repelX = 0.0;
-  double repelY = 0.0;
+    /* 2. Convert (dir,speed) → Cartesian (x,y)  */
+    double angleRad = (90.0 - dir) * M_PI / 180.0;   // CW to math CCW
+    double x = cos(angleRad) * speed;   // +x = East/right
+    double y = sin(angleRad) * speed;   // +y = North/forward
 
-  if (getDir() > 90 && getDir() <270){
-    repelY += calculateRepelEffect(ultraB, backStart, backHard);
-  }
-  else
-  {
-    repelY -= calculateRepelEffect(ultraF, frontStart, frontHard, 0.6);
-  }
+    /* 3. Pick a sensor for each axis and get its ratio */
+    double repelXRatio, repelYRatio;
 
-  if (getDir() > 180){
-    repelX += calculateRepelEffect(ultraL, leftStart, leftHard);
-  }
-  else
-  {
-    repelX -= calculateRepelEffect(ultraR, rightStart, rightHard);
-  }
+    if (x >= 0) {   // moving / pointing RIGHT → use right sensor
+        repelXRatio = calculateRepelEffect(ultraR,
+                                           rightStart, rightStop, rightReverse);
+    } else {        // moving LEFT → use left sensor
+        repelXRatio = calculateRepelEffect(ultraL,
+                                           leftStart,  leftStop,  leftReverse);
+    }
 
-  double repelMag = sqrt(repelX * repelX + repelY * repelY);
+    if (y >= 0) {   // moving FORWARD → use front sensor
+        repelYRatio = calculateRepelEffect(ultraF,
+                                           frontStart, frontStop, frontReverse);
+    } else {        // moving BACKWARD → use back sensor
+        repelYRatio = calculateRepelEffect(ultraB,
+                                           backStart,  backStop,  backReverse);
+    }
 
-  // Serial.print("RepelX: "); Serial.print(repelX);
-  // Serial.print("  RepelY: "); Serial.print(repelY);
-  // Serial.print("  Magnitude: "); Serial.print(repelMag);
+    /* 4. Apply the ratios (scale / stop / reverse) */
+    x *= repelXRatio;
+    y *= repelYRatio;
 
-  int currDir = getDir();    // 0–359
-  int currSpeed = getSpeed(); // Magnitude
+    /* 5. Convert back to polar coordinates */
+    double newMag = sqrt(x * x + y * y);
+    int    newSpeed = (int)newMag;
+    int    newDir   = 360;            // 360 → “stop / undefined”
 
-  double angleRad = (90 - currDir) * M_PI / 180.0;
-  double x = cos(angleRad) * currSpeed;
-  double y = sin(angleRad) * currSpeed;
+    if (newMag > 0.01) {
+        double newAng = atan2(y, x);  // –π … +π  (CCW from +x)
+        newDir = ((int)(90.0 - newAng * 180.0 / M_PI + 360.0)) % 360;
+    }
 
-  // Serial.print("X: "); Serial.print(x);
-  // Serial.print("  Y: "); Serial.print(y);
-
-  const double MAX_REPEL_FORCE = 50.0; // You can tune this value//60
-  x += repelX * MAX_REPEL_FORCE;
-  y += repelY * MAX_REPEL_FORCE;
-
-  // Step 4: Convert back to polar coordinates
-  double combinedMag = sqrt(x * x + y * y);
-  int newSpeed = (int)combinedMag;
-  int newDir = 360; // default STOP
-
-  if (combinedMag > 0.01) {
-    double combinedAngle = atan2(y, x);
-    newDir = ((int)(90 - combinedAngle * 180.0 / M_PI + 360)) % 360;
-  }
-
-  // Step 5: Apply or print
-  setSpeed(newSpeed);
-  setDir(newDir);
-
-  // Serial.print("  NewDir: "); Serial.print(newDir);
-  // Serial.print("  NewSpeed: "); Serial.println(newSpeed);
+    /* 6. Send to the drivetrain */
+    setSpeed(newSpeed);
+    setDir(newDir);
 }
