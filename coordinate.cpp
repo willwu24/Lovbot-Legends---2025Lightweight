@@ -3,7 +3,7 @@
 // --- Main Coordinate Function ---
 void getCoordinate() {
   long currTime = millis();
-  long acceptedInterval = 0;
+  long acceptedInterval = 100;
   posInfo returnPosition;
 
   int left  = getUltraLeft();

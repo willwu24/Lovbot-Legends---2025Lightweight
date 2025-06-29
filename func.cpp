@@ -316,7 +316,7 @@ void STOPNOW() {
 //---------------------------------------------------------------- LASER & BALL
 
 bool getLaser() {
-  return analogRead(LAZER_PIN) < 3;
+  return analogRead(LAZER_PIN) < 10;
 }
 
 bool hasBall() {

@@ -23,5 +23,7 @@ void whiteMove(int dir);
 // Calculate and return the appropriate defense direction
 int getDefenseDir();
 
+void blockGoalie();
+
 
 #endif  // DEFENSE_H

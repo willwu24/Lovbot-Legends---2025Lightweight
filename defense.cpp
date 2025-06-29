@@ -5,6 +5,9 @@ int prevWhiteDetected = -1;
 int lastGoalAngle = -1;
 int defenseSpeedOffset;
 
+int defenseReached = 0;
+int lastDefenseReached = 0;
+
 long firstHasBall = -1;
 long firstBallFront = -1;
 bool gettingBall = false;
@@ -47,13 +50,21 @@ void setupDefense(){
 
 void defenseMain(){
   retrieveKicker();
-  setAngleThres(20);
+  setAngleThres(50);//20
   // setTarget(0);
-  //setMotorMode(1);
+  // setMotorMode(1);
   setTurningMode(1);
   if(homeDetected()){
     lastGoalAngle = getHomeAngle();
   }
+
+  if (buttonPressed(1) || defenseReached > 0){
+    blockGoalie();
+  }
+  else
+  {
+    lastDefenseReached = millis();
+    defenseReached = 0;
   if(0){//hasBall()){
     Serial.print("HAS BALL");
     setAngleThres(10);
@@ -103,7 +114,7 @@ void defenseMain(){
     Serial.print("ON WHITE LINE");
     whiteMove(getDefenseDir());
     prevWhiteDetected = -1;
-    defenseSpeedOffset = constrain(defenseSpeedOffset,5,45);//TUnE
+    defenseSpeedOffset = constrain(defenseSpeedOffset,5,45);//TUNE
     setSpeed(defenseSpeedOffset);
     if(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())<5&&homeDetected()&&(abs(getAngleDif(90, getWhiteAngle()))<10||abs(getAngleDif(270, getWhiteAngle()))<10)){//on the side white line
       if(getUltraBack()>88){//actually side white line, go back    //TUNE
@@ -200,6 +211,7 @@ void defenseMain(){
       // }
     }
   }
+  }
 
 }
 
@@ -252,7 +264,7 @@ int getDefenseDir(){
   }
 
   int moveAngle = 0;
-  if (ballAngle>180){
+  if (ballAngle>180){ //left
     moveAngle = 90;
   }
   else{
@@ -279,7 +291,7 @@ int getDefenseDir(){
   double distRatio = getEyeValue()/200.0;
   distRatio = constrain(distRatio,0.8,1.0);
 
-  defenseSpeedOffset = cornerRatio*angleRatio*120;
+  defenseSpeedOffset = cornerRatio*angleRatio*120;//120
 
   if (whiteDir < 160 && (getEyeAngle() > 180||getEyeAngle()<=20)){
     defenseDir = 90;
@@ -293,7 +305,7 @@ int getDefenseDir(){
   //   defenseDir = (defenseDir+180)%360; //moving back 
   //   defenseSpeedOffset = 10;
   // }
-
+  // defenseSpeedOffset = 40;
   return defenseDir;
 }
 
@@ -304,4 +316,78 @@ void resetVariables(){
   gettingBall = false;
   firstBallFront = -1;
   firstGettingBall = -1;
+}
+
+void blockGoalie(){
+  if (defenseReached == 0){
+    defenseReached = 1;
+  }
+  if (defenseReached == 1){
+    setAngleThres(20);
+    int tempOffset = (getUltraLeft() - getUltraRight())*0.5;
+    setDir((0 - tempOffset + 360)%360);
+    int tempBlockSpeed = 40 - ((millis() - lastDefenseReached)/80);
+
+    tempBlockSpeed = constrain(tempBlockSpeed, 15, 40);
+    setSpeed(tempBlockSpeed);
+    if (whiteDetected() && millis() - lastDefenseReached > 500){
+      defenseReached = 2;
+    }
+  }
+  else if (defenseReached == 2){
+    if (getMagnitude() > 0){
+      setDir(0);
+      setSpeed(12);
+    }
+    else
+    {
+      setDir(180);
+      setSpeed(12);
+    }
+    
+    if (getMagnitude() < 0.2 && getMagnitude() > -0.2){
+      lastDefenseReached = millis();
+      defenseReached = 3;
+    }
+  }
+  else if (defenseReached == 3){
+    setSpeed(25);
+    if (getUltraLeft() < 50){
+      whiteMove((getWhiteAngle() + 270)%360);
+    }
+    else if (getUltraRight() < 50){
+      whiteMove((getWhiteAngle() + 90)%360);
+    }
+    else{
+      setDir(STOP);
+    }
+    if (millis() - lastDefenseReached > 10000){
+      defenseReached = 4;
+    }
+  }
+  else if (defenseReached == 4){
+    setDir(180);
+    setSpeed(20);
+    if (!whiteDetected()){
+      defenseReached = 0;
+    }
+  }
+  // if(whiteDetected()&&getUltraFront()>80){
+  //   int whiteAngle = (getWhiteAngle()+getCompass())%360;
+  //   if(whiteAngle<5&&whiteAngle>355){
+  //     setDir(STOP);
+  //   }
+  //   else{
+  //     if(whiteAngle>180){
+  //       whiteMove(90+whiteAngle);
+  //     }
+  //     else{
+  //       whiteMove(270+whiteAngle);
+  //     }
+  //   }
+  // }
+  // else{
+  //   goToCoordinate(0, 200);
+  // }
+
 }

@@ -9,10 +9,10 @@ int lastWhiteAngle = 0;
 int lastTarget = 0;
 int firstBall = 0;
 
-int frontStart = 100, frontHard = 0;
-int backStart  = 200, backHard  = 50;
-int leftStart  = 200, leftHard  = 50;
-int rightStart = 200, rightHard = 50;
+int frontStart = 100, frontHard = 75;
+int backStart  = 100, backHard  = 75;
+int leftStart  = 100, leftHard  = 60;
+int rightStart = 100, rightHard = 60;
 
 bool turnSet = false;
 
@@ -25,7 +25,8 @@ void offenseMain() {
   setAngleThres(40);
 
   // === White Line Detected ===
-  if (whiteDetected() && firstBall != 1) {
+  // if (whiteDetected() && firstBall != 1) {
+  if (0){
     turnSet = false;
     setTarget(0);
     setMotorMode(0);
@@ -56,10 +57,11 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    if(0){
+    if(hasBall()){
       goToBallPID();
       applyAirWall();
-      // kick();
+      //kick();
+      setSpeed(50);
     }
     else if (getEyeValue() < 12){
       turnSet = false;
@@ -69,28 +71,28 @@ void offenseMain() {
     else
     {
       setTarget(0);
-      // if (!turnSet && getEyeValue() > 230 && getUltraFront() < 200 && (abs(getUltraLeft() - getUltraRight())) > 30){
-      //   Serial.print("Turning Condition: ");
-      //   Serial.print(turnSet);
-      //   Serial.print("    ");
-      //   if (getUltraRight() < getUltraLeft() && getUltraRight() < 110 )
-      //   {
-      //     setTarget(350);
-      //     turnSet = true;
-      //   }
-      //   else if (getUltraLeft() < getUltraRight() && getUltraLeft() < 110){
-      //     setTarget(10);
-      //     turnSet = true;
-      //   }
-      //   Serial.println(getTarget());
-      // }
-      // else if (!turnSet){
-      //   setTarget(0);
-      // }
+      if (!turnSet && getEyeValue() > 230 && getUltraFront() < 200 && (abs(getUltraLeft() - getUltraRight())) > 30){
+        Serial.print("Turning Condition: ");
+        Serial.print(turnSet);
+        Serial.print("    ");
+        if (getUltraRight() < getUltraLeft() && getUltraRight() < 110 )
+        {
+          setTarget(330);
+          turnSet = true;
+        }
+        else if (getUltraLeft() < getUltraRight() && getUltraLeft() < 110){
+          setTarget(30);
+          turnSet = true;
+        }
+        Serial.println(getTarget());
+      }
+      else if (!turnSet){
+        setTarget(0);
+      }
 
-      // if (getEyeValue() < 180){
-      //   turnSet = false;
-      // }
+      if (getEyeValue() < 180){
+        turnSet = false;
+      }
     
       goToBallPID();
       applyAirWall();
@@ -137,7 +139,7 @@ void applyAirWall(){
   }
   else
   {
-    repelY -= calculateRepelEffect(ultraF, frontStart, frontHard);
+    repelY -= calculateRepelEffect(ultraF, frontStart, frontHard, 0.6);
   }
 
   if (getDir() > 180){
@@ -164,7 +166,7 @@ void applyAirWall(){
   // Serial.print("X: "); Serial.print(x);
   // Serial.print("  Y: "); Serial.print(y);
 
-  const double MAX_REPEL_FORCE = 60.0; // You can tune this value
+  const double MAX_REPEL_FORCE = 50.0; // You can tune this value//60
   x += repelX * MAX_REPEL_FORCE;
   y += repelY * MAX_REPEL_FORCE;
 

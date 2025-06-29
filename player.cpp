@@ -18,13 +18,13 @@ void player() {
   setRobotRole(OFFENSE);     // Set initial role
   setupVariables();
   // while(1){
-  //   setMotors(20,20,20,20);
+  //   setMotors(20,20,-20,-20);
   // }
 
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    //displayUpdate();
+    displayUpdate();
     getCameraData();
     processSensors();
     processWhiteAngle();
@@ -45,22 +45,20 @@ void player() {
     } else {
       //goToCoordinate(0,-220);
       defenseMain();
+      // setDir(STOP);
       // whiteMove(getDefenseDir());
       // setAngleThres(25);
       // setSpeed(20);
     }
     //goToCoordinate(0, 0);
     // === Actuation ===
+    Serial.print(analogRead(A3));
+
     move();
 
     // === Debugging ===
 
     // Additional debug (uncomment to use):
-    //displayCamera();
-    //displayDistance();
-    //displayCompass();
-    // printSensorsReading();
-    // printSensorsWhite();
-    // Serial.println(getHomeAngle());
+
   }
 }
