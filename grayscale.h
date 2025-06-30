@@ -63,7 +63,7 @@ void getEEPROMThreshold();
 double getMagnitude();
 double getXSum();
 double getYSum();
-bool getInCorner();
+// bool getInCorner();
 
 void getWhiteSensor(bool output[32]);
 

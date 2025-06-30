@@ -50,7 +50,7 @@ void setupDefense(){
 
 void defenseMain(){
   retrieveKicker();
-  setAngleThres(50);//20
+  setAngleThres(20);//20
   // setTarget(0);
   // setMotorMode(1);
   setTurningMode(1);
@@ -58,7 +58,7 @@ void defenseMain(){
     lastGoalAngle = getHomeAngle();
   }
 
-  if (buttonPressed(1) || defenseReached > 0){
+  if (getReceiveArr(0)==1 || defenseReached > 0){
     blockGoalie();
   }
   else
@@ -66,7 +66,7 @@ void defenseMain(){
     lastDefenseReached = millis();
     defenseReached = 0;
   if(0){//hasBall()){
-    Serial.print("HAS BALL");
+    //Serial.print("HAS BALL");
     setAngleThres(10);
     firstGettingBall=-1;
     firstBallFront = -1;
@@ -83,13 +83,13 @@ void defenseMain(){
   }
 
   else if(gettingBall){//get ball from neutral spot
-    Serial.print("GETTING BALL");
+    //Serial.print("GETTING BALL");
     firstBallFront=-1;
     firstHasBall = -1;
     if(firstGettingBall==-1){
       firstGettingBall = millis();
     }
-    else if(millis()-firstGettingBall>600){//went for too long, go back now
+    else if(millis()-firstGettingBall>700){//went for too long, go back now
       gettingBall=false;
       firstGettingBall = -1;
     }
@@ -100,7 +100,7 @@ void defenseMain(){
     else{
       goToBallPID();
       //setDir(0);
-      setSpeed(40);
+      setSpeed(50);
 
     }
     // setSpeed(max(getSpeed(),30));
@@ -111,7 +111,7 @@ void defenseMain(){
     firstGettingBall=-1;
     gettingBall = false;
     firstHasBall = -1;
-    Serial.print("ON WHITE LINE");
+    //Serial.print("ON WHITE LINE");
     whiteMove(getDefenseDir());
     prevWhiteDetected = -1;
     defenseSpeedOffset = constrain(defenseSpeedOffset,5,45);//TUNE
@@ -285,13 +285,13 @@ int getDefenseDir(){
     cornerRatio = 0.4;
   }
 
-  double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/80.0;//90.0
+  double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;//90.0
   angleRatio = constrain(angleRatio, 0.0,1.0);
 
   double distRatio = getEyeValue()/200.0;
   distRatio = constrain(distRatio,0.8,1.0);
 
-  defenseSpeedOffset = cornerRatio*angleRatio*120;//120
+  defenseSpeedOffset = cornerRatio*angleRatio*80;//120
 
   if (whiteDir < 160 && (getEyeAngle() > 180||getEyeAngle()<=20)){
     defenseDir = 90;
@@ -351,12 +351,89 @@ void blockGoalie(){
     }
   }
   else if (defenseReached == 3){
-    setSpeed(25);
+    setSpeed(30);
     if (getUltraLeft() < 50){
       whiteMove((getWhiteAngle() + 270)%360);
     }
     else if (getUltraRight() < 50){
       whiteMove((getWhiteAngle() + 90)%360);
+    }
+    else{
+      setDir(STOP);
+    }
+    if (millis() - lastDefenseReached > 10000){
+      defenseReached = 4;
+    }
+  }
+  else if (defenseReached == 4){
+    setDir(180);
+    setSpeed(20);
+    if (!whiteDetected()){
+      defenseReached = 0;
+    }
+  }
+  // if(whiteDetected()&&getUltraFront()>80){
+  //   int whiteAngle = (getWhiteAngle()+getCompass())%360;
+  //   if(whiteAngle<5&&whiteAngle>355){
+  //     setDir(STOP);
+  //   }
+  //   else{
+  //     if(whiteAngle>180){
+  //       whiteMove(90+whiteAngle);
+  //     }
+  //     else{
+  //       whiteMove(270+whiteAngle);
+  //     }
+  //   }
+  // }
+  // else{
+  //   goToCoordinate(0, 200);
+  // }
+
+}
+
+void blockGoalie1(){
+  int targetFront = 90;
+
+  if (defenseReached == 0){
+    defenseReached = 1;
+  }
+  if (defenseReached == 1){
+    setAngleThres(20);
+    int tempOffset = (getUltraLeft() - getUltraRight())*0.5;
+    setDir((0 - tempOffset + 360)%360);
+    int tempBlockSpeed = 40 - ((millis() - lastDefenseReached)/80);
+
+    tempBlockSpeed = constrain(tempBlockSpeed, 15, 40);
+    setSpeed(tempBlockSpeed);
+    if (whiteDetected() && millis() - lastDefenseReached > 500 && getUltraFront()<90){
+      defenseReached = 2;
+    }
+  }
+  else if (defenseReached == 2){
+
+    if (getUltraFront() > targetFront){
+      setDir(0);
+      setSpeed(20);
+    }
+    else
+    {
+      setDir(180);
+      setSpeed(20);
+    }
+    
+    if (getUltraFront() < targetFront+5 && getUltraFront() > targetFront-5){
+      lastDefenseReached = millis();
+      defenseReached = 3;
+    }
+  }
+  else if (defenseReached == 3){
+    setSpeed(30);
+    if (getUltraLeft() < 50){
+      setDir((270)%360);
+    }
+    else if (getUltraRight() < 50){
+      setDir((90)%360);
     }
     else{
       setDir(STOP);

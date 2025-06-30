@@ -30,6 +30,7 @@ void offenseMain() {
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
+    changeSendArr(0, 0);
   // if (0){
     turnSet = false;
     setTarget(0);
@@ -57,6 +58,7 @@ void offenseMain() {
 
     resetBallPID();
     setDir(lastWhiteAngle);
+
   }
 
   // === Default Behavior ===
@@ -71,6 +73,7 @@ void offenseMain() {
       applyAirWall();
     }
     else if (getEyeValueSmooth() < 12){
+      changeSendArr(0, 1);
       resetBallPID();
       targetSet = 0;
       setTarget(0);
@@ -83,6 +86,10 @@ void offenseMain() {
       setTarget(0);
       goToBallPID();
       applyAirWall();
+      if(inCorner()){
+        setDir(STOP);
+        changeSendArr(0, 1);
+      }
     }
   }
 }
@@ -178,4 +185,12 @@ void applyAirWall()
     /* 6. Send to the drivetrain */
     setSpeed(newSpeed);
     setDir(newDir);
+}
+
+bool inCorner(){
+  bool ballFront = getEyeAngle()<30||getEyeAngle()>330;
+  if(ballFront&&getUltraFront()<80&&(getUltraLeft()<90||getUltraRight()<90)&&getHomeDistance()>100){
+    return true;
+  }
+  return false;
 }

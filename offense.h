@@ -25,5 +25,7 @@ double calculateRepelEffect(int   distance,
                             int   reverseThreshold);
 void applyAirWall();
 
+bool inCorner();
+
 
 #endif

@@ -42,8 +42,8 @@ double yDistance = 0;
 
 // --- Corner Detection ---
 int cornerCounter = 0;
-bool inCorner = false;
-std::queue<int> pastWhites;  // Unused but declared
+// bool inCorner = false;
+// std::queue<int> pastWhites;  // Unused but declared
 
 // --- Threshold Calibration ---
 int calibrationTimer = 0;
@@ -386,4 +386,4 @@ bool getFlip()           { return flip; }
 double getMagnitude()    { return magnitude; }
 double getXSum()         { return xDistance; }
 double getYSum()         { return yDistance; }
-bool getInCorner()       { return inCorner; }
+// bool getInCorner()       { return inCorner; }
