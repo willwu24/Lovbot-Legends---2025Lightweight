@@ -15,10 +15,10 @@ int lastTargetSet = 0;
 
 int lastAround = 0;
 
-const int frontStart = 150, frontStop = 0, frontReverse = 0;
-const int backStart = 150, backStop = 60, backReverse = 0;
-const int leftStart = 150, leftStop = 45, leftReverse = 0;
-const int rightStart = 150, rightStop = 45, rightReverse = 0;
+const int frontStart = 200, frontStop = 0, frontReverse = 0;
+const int backStart = 180, backStop = 70, backReverse = 0;
+const int leftStart = 180, leftStop = 50, leftReverse = 0;
+const int rightStart = 180, rightStop = 50, rightReverse = 0;
 
 bool turnSet = false;
 
@@ -26,7 +26,7 @@ bool turnSet = false;
 void offenseMain() {
   retrieveKicker();
   setTurningMode(1);
-  setAngleThres(40);
+  setAngleThres(45);
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
@@ -64,7 +64,6 @@ void offenseMain() {
 
     if(hasBall()){
       lastTargetSet = millis();
-
       if (millis() - lastAround > 150){
         kick();
       }
@@ -72,42 +71,18 @@ void offenseMain() {
       applyAirWall();
     }
     else if (getEyeValueSmooth() < 12){
+      resetBallPID();
       targetSet = 0;
       setTarget(0);
       goToCoordinate(0, 0);
     }
     else
     {
+      targetSet = 0;
       lastAround = millis();
-
-      if (targetSet == 0 && abs(getUltraLeftSmooth() - getUltraRightSmooth()) > 30 && getEyeValue() > 225 && (getEyeAngle() < 90 || getEyeAngle() > 270)){
-        lastTargetSet = millis();
-        if (getUltraLeftSmooth() < getUltraRightSmooth()){
-          targetSet = 1;
-        }
-        else{
-          targetSet = 2;
-        }
-      }
-
-      if (targetSet == 1 && millis() - lastTargetSet < 1000){
-        setTarget(30);
-      }
-      else if (targetSet == 2 && millis() - lastTargetSet < 1000)
-      {
-        setTarget(330);
-      }
-      else{
-        targetSet = 0;
-        setTarget(0);
-      }
-
-
-    
+      setTarget(0);
       goToBallPID();
-      if (targetSet == 0){
-        applyAirWall();
-      }
+      applyAirWall();
     }
   }
 }

@@ -47,10 +47,10 @@ void goToCoordinate(int tarX, int tarY){
     currMove.dist = distCalculator(currCO, targetCO);
     currMove.dir = isParked(currMove.dist) ? 360 : dirCalculator(currCO, targetCO);
   }
-
+  
+  setTarget(0);
   setDir(currMove.dir);
   setSpeed(speedCalculator(currMove.dist));
-  setTarget(0);
 }
 
 bool isParked(int dist) {
