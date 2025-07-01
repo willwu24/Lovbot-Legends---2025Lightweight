@@ -24,7 +24,7 @@ void player() {
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    displayUpdate();
+    // displayUpdate();
     getCameraData();
     processSensors();
     processWhiteAngle();
@@ -44,7 +44,13 @@ void player() {
     if (getRobotRole() == OFFENSE) {
       offenseMain();
     } else {
+      // defenseMain();
       defenseMain();
+      Serial.print(getEyeAngle());
+      Serial.print(" ");
+      Serial.print(getDir());
+      Serial.print(" ");
+      Serial.println(getDefenseDir());
     }
     //goToCoordinate(0, 0);
     // === Actuation ===
@@ -52,9 +58,9 @@ void player() {
     move();
 
     // === Debugging ===
-    Serial.print(getSendArr(0));
-    Serial.print(' ');
-    Serial.println(getReceiveArr(0));
+    // Serial.print(getSendArr(0));
+    // Serial.print(' ');
+    // Serial.println(getReceiveArr(0));
     // Additional debug (uncomment to use):
 
   }

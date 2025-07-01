@@ -17,13 +17,12 @@ void defenseMain(){
   }
   else
   {
-    int tempCorner = (getWhiteAngle() + getCompass())%360;
-    if (((tempCorner > 30 && tempCorner < 60) || (tempCorner > 210 && tempCorner < 240)) && getEyeAngle() < 180)
+    int tempCorner = (getDefenseDir() + getCompass())%360;
+    if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
     {
-      whiteMove((270 + getWhiteAngle() + getCompass())%360);
-    }
-    else if (((tempCorner > 120 && tempCorner < 150) || (tempCorner > 300 && tempCorner < 330)) && getEyeAngle() < 180){
-      whiteMove((90 + getWhiteAngle() + getCompass())%360);
+      whiteMove((getDefenseDir() + 180)%360);
+      lastWhiteDir = getWhiteAngle();
+      lastDefenseWhiteTime = millis();
     }
     else
     {
@@ -74,20 +73,43 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   finalHeading = fmod(finalHeading + 360.0, 360.0);   // 0 … 359.999
 
   /* 5. Convert to field frame with compass ------------------ */
-  finalHeading = fmod(finalHeading + getCompass(), 360.0);
+  // finalHeading = fmod(finalHeading + getCompass(), 360.0);
 
   setDir(finalHeading);                                // field-absolute
+  
+  double goalRatio = abs(getAngleDif(180, (getHomeAngle() + getCompass())%360)) / 40.0;
+  goalRatio = constrain(goalRatio, 0.0, 0.8);
+  goalRatio = 1.0 - goalRatio;
 
-  double goalRatio = abs(getAngleDif(180, getHomeAngle())) / 30.0;
-  goalRatio = constrain(goalRatio, 0.2, 1.0);
+  double cornerRatio;
+  int tempCorner = (getDefenseDir() + getCompass())%360;
+  if (getEyeAngle() > 180){
+    cornerRatio = (270 - tempCorner) / 30;
+  }
+  else{
+    cornerRatio = (tempCorner - 90) / 30;
+  }
+  cornerRatio = constrain(cornerRatio, 0.0, 1.0);
+  cornerRatio = 1.0-cornerRatio;
+
+  int defenseGoalAngle = (getHomeAngle() + getCompass())%360;
+
+  if ((defenseGoalAngle > 180 && getEyeAngle() > 180) || (defenseGoalAngle < 180 && getEyeAngle() < 180)){
+    goalRatio = 1.0;
+  }
 
   double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;//90.0
   angleRatio = constrain(angleRatio, 0.0,1.0);
 
   // double distRatio = getEyeValue()/200.0;
   // distRatio = constrain(distRatio,0.8,1.0);
-
-  setSpeed(angleRatio*goalRatio*40);
+  if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
+  {
+    setSpeed(20);
+  }
+  else{
+    setSpeed(angleRatio*cornerRatio*40);
+  }
 }
 
 bool isCorner(int angle, int CORNER_TH)
@@ -103,24 +125,42 @@ bool isCorner(int angle, int CORNER_TH)
 
 int getDefenseDir()
 {
-  int whiteDir = getWhiteAngle();
-  int ballAngle = getEyeAngle();
-  /* 1.  Decide which side the ball is on --------------------- */
-  int moveAngle;                   // +90° = right (east), +270° = left (west)
-  if (ballAngle > 180) {           // ball on the left (west) side
-      moveAngle = 270;
-  } else {                         // ball on the right (east) side
-      moveAngle = 90;
-  }
+    /* --- 1. Normalise angles -------------------------------- */
+    int whiteDir = getWhiteAngle();
+    if (whiteDir < 0) whiteDir += 360;
+    whiteDir %= 360;
 
-  /* 2.  Add or subtract the offset, depending on whiteDir ---- */
-  int defenseDir;
-  if (whiteDir > 90 && whiteDir < 270) {
-      // stripe normal points forward → add the offset
-      defenseDir = (whiteDir + 360 - moveAngle) % 360;  // (whiteDir - moveAngle) wrapped
-  } else {
-      // stripe normal points backward → subtract the offset
-      defenseDir = (whiteDir + moveAngle) % 360;
-  }
-  return defenseDir;               // 0‒359°
+    int ballAngle = getEyeAngle();
+    if (ballAngle < 0) ballAngle += 360;
+    ballAngle %= 360;
+
+    /* --- 2. Choose ±90° offset based on ball side ------------ */
+    int moveAngle;
+    if (ballAngle > 180) {
+        moveAngle = 270;        // ball is left  → use left offset
+    } else {
+        moveAngle = 90;         // ball is right → use right offset
+    }
+
+    /* --- 3. Decide stripe orientation with hysteresis -------- */
+    static int stripeForward = 1;          // remember last state
+    const double tol = 0.1736;             // 10° dead-band
+    double yComp = cos(whiteDir * M_PI / 180.0);
+
+    if (yComp >  tol) stripeForward = 1;   // clearly forward
+    if (yComp < -tol) stripeForward = 0;   // clearly backward
+
+    /* --- 4. Preliminary heading (same formula as before) ----- */
+    int defenseDir;
+    if (stripeForward) {
+        defenseDir = (whiteDir + 360 - moveAngle) % 360;
+    } else {
+        defenseDir = (whiteDir + moveAngle) % 360;
+    }
+
+    /* --- 5. Flip 180° to stand on the correct side ----------- */
+    defenseDir = (defenseDir + 180) % 360;
+
+    return defenseDir;                     // 0–359°
 }
+

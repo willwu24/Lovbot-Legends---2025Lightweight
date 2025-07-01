@@ -35,12 +35,12 @@ void setup() {
   
   setupKicker();
   setupCamera();
-  // setupCompass();
+  setupCompass();
   setupBluetooth();
   initSensors();
   eyeSetup();
   setUpBallPID();
-  displaySetup();
+  // displaySetup();
 
   Serial.println("Finished setup.");
 }
