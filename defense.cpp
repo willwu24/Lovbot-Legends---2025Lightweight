@@ -56,9 +56,16 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   /* 1. White-line vector (robot frame) ----------------------- */
   double mag     = getMagnitude();          // 0 … 1
   double wlAngle = getWhiteAngle();         // 0 … 359 (robot frame)
+  int tempCorner = (getDefenseDir() + getCompass())%360;
 
-  double wx = 0.3 * mag * sin(toRadian(wlAngle)); // X: East+
-  double wy = 0.3 * mag * cos(toRadian(wlAngle)); // Y: North+
+
+
+  double defenseTuning = min(abs(getAngleDif(180,tempCorner), abs(getAngleDif(0,tempCorner))))/90.0;
+  defenseTuning = constrain(defenseTuning, 0.2, 1.0);
+
+
+  double wx = defenseTuning * mag * sin(toRadian(wlAngle)); // X: East+
+  double wy = defenseTuning * mag * cos(toRadian(wlAngle)); // Y: North+
 
   /* 2. Drive vector (robot frame) ---------------------------- */
   double dx = sin(toRadian(dir));           // ±1
@@ -82,7 +89,6 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   goalRatio = 1.0 - goalRatio;
 
   double cornerRatio;
-  int tempCorner = (getDefenseDir() + getCompass())%360;
   if (getEyeAngle() > 180){
     cornerRatio = (270 - tempCorner) / 30;
   }
