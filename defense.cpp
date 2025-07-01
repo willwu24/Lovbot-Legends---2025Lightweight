@@ -1,470 +1,126 @@
 #include "defense.h"
 
-int whiteDir = -1;
-int prevWhiteDetected = -1;
-int lastGoalAngle = -1;
-int defenseSpeedOffset;
+int lastWhiteDir = 180;
+int lastDefenseWhiteTime = 0;
+int ballTimer = 0;
 
-int defenseReached = 0;
-int lastDefenseReached = 0;
-
-long firstHasBall = -1;
-long firstBallFront = -1;
-bool gettingBall = false;
-long firstGettingBall = -1;
-//27
-
-// TODO:
-/*
-- going back to white line when goal angle can't be seen but kinda can
-- back white line is out
-- slowdown near end of penalty line
-- going to center of whiteline when not moving
-- pid for angle, then pid for eye value
-*/
-
-int minDefenseSpeed = 30;//25
-int maxDefenseSpeed = 55; 
-int defenseSpeedDiff = (maxDefenseSpeed-minDefenseSpeed)/2;
-double distBallClosest, defBallDist, distSpeedRatio;
-double distKp=1.5, distKi=0.0, distKd=0.10;
-double distPIDMin = 0;
-double distPIDMax = 100;
-PID distPID(&defBallDist, &distSpeedRatio, &distBallClosest, distKp, distKi, distKd, DIRECT);
-double angleBallClosest, defBallAngle, angleSpeedRatio;
-double angleKp=1.5, angleKi=0.0, angleKd=0.1;
-double anglePIDMin = 0;
-double anglePIDMax = 100;
-PID anglePID(&defBallAngle, &angleSpeedRatio, &angleBallClosest, angleKp, angleKi, angleKd, REVERSE);
-
-
-void setupDefense(){
-  distBallClosest = 20; // Make sure to test this
-  angleBallClosest = 0;
-  distPID.SetOutputLimits(distPIDMin, distPIDMax);
-  distPID.SetMode(AUTOMATIC);
-  anglePID.SetOutputLimits(anglePIDMin, anglePIDMax);
-  anglePID.SetMode(AUTOMATIC);
-  Serial.println("BallSetup Complete");
-}
+double finalHeading;
 
 void defenseMain(){
-  retrieveKicker();
-  setAngleThres(20);//20
-  // setTarget(0);
-  // setMotorMode(1);
-  setTurningMode(1);
-  if(homeDetected()){
-    lastGoalAngle = getHomeAngle();
+  setAngleThres(12);
+  if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1000){
+    setSpeed(15);
+    setDir(lastWhiteDir);
   }
-
-  if (getReceiveArr(0)==1 || defenseReached > 0){
-    blockGoalie();
+  else if (!whiteDetected()){
+    goToCoordinate(0,0);
   }
   else
   {
-    lastDefenseReached = millis();
-    defenseReached = 0;
-  if(0){//hasBall()){
-    //Serial.print("HAS BALL");
-    setAngleThres(10);
-    firstGettingBall=-1;
-    firstBallFront = -1;
-    gettingBall = false;
-    setSpeed(50);
-    setDir(0);
-    if(firstHasBall==-1){
-      firstHasBall = millis();
+    int tempCorner = (getWhiteAngle() + getCompass())%360;
+    if (((tempCorner > 30 && tempCorner < 60) || (tempCorner > 210 && tempCorner < 240)) && getEyeAngle() < 180)
+    {
+      whiteMove((270 + getWhiteAngle() + getCompass())%360);
     }
-    else if(millis()-firstHasBall>50){
-      //kick();
-      firstHasBall = -1;
+    else if (((tempCorner > 120 && tempCorner < 150) || (tempCorner > 300 && tempCorner < 330)) && getEyeAngle() < 180){
+      whiteMove((90 + getWhiteAngle() + getCompass())%360);
+    }
+    else
+    {
+      whiteMove(getDefenseDir());
+      lastWhiteDir = getWhiteAngle();
+      lastDefenseWhiteTime = millis();
     }
   }
 
-  else if(gettingBall){//get ball from neutral spot
-    //Serial.print("GETTING BALL");
-    firstBallFront=-1;
-    firstHasBall = -1;
-    if(firstGettingBall==-1){
-      firstGettingBall = millis();
-    }
-    else if(millis()-firstGettingBall>700){//went for too long, go back now
-      gettingBall=false;
-      firstGettingBall = -1;
-    }
-    else if(whiteDetected()&&millis()-firstGettingBall>300){//hit white line, go back
-      gettingBall=false;
-      firstGettingBall = -1;
-    }
-    else{
-      goToBallPID();
-      //setDir(0);
-      setSpeed(50);
+  // bool ballAhead = whiteDetected() && ((getEyeAngle() < 45) || (getEyeAngle() > 315)) &&  (getEyeValue() > 150);
 
-    }
-    // setSpeed(max(getSpeed(),30));
-  }
-
-  else if(whiteDetected()){//on white line
-    setTarget(0);
-    firstGettingBall=-1;
-    gettingBall = false;
-    firstHasBall = -1;
-    //Serial.print("ON WHITE LINE");
-    whiteMove(getDefenseDir());
-    prevWhiteDetected = -1;
-    defenseSpeedOffset = constrain(defenseSpeedOffset,5,45);//TUNE
-    setSpeed(defenseSpeedOffset);
-    if(abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())<5&&homeDetected()&&(abs(getAngleDif(90, getWhiteAngle()))<10||abs(getAngleDif(270, getWhiteAngle()))<10)){//on the side white line
-      if(getUltraBack()>88){//actually side white line, go back    //TUNE
-        setDir(getHomeAngle());
-        setSpeed(30);
-      }
-      else{//not there, on the end of the goal white line, go forward
-        setDir(0);
-        setSpeed(15);
-      }
-    }
-    else if(!homeDetected()){//in the corner
-      setSpeed(15);
-      if(lastGoalAngle<180){//go back to white line
-        setDir(45);
-        if(getUltraRight()>100){
-          setDir(0);
-        }
-      }
-      else{
-        setDir(315);
-        if(getUltraLeft()>100){
-          setDir(0);
-        }
-      }
-    }
-    else if((getEyeAngle()<=60||getEyeAngle()>=300)&&getEyeValue()>250){//ball in front
-      Serial.print("ball front");
-      if(firstBallFront==-1){
-        firstBallFront = millis();
-      }
-      else if(millis()-firstBallFront>1000){
-        // setTarget((getEyeAngle()+getCompass())%360);
-        // setAngleThres(15);
-        gettingBall = true;
-      }
-    }
-    else{//reset Variables
-      firstBallFront = -1;
-    }
-  }
-
-  else{ //returning to white
-    setTarget(0);
-    firstGettingBall=-1;
-    firstBallFront = -1;
-    gettingBall = false;
-    firstHasBall = -1;
-    if(homeDetected()&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>15||(getHomeDistance()>40&&abs(getHomeLeftEdgeAngle()-getHomeRightEdgeAngle())>3)){//in the middle
-      if(getUltraBack()<88){
-        setSpeed(15);
-        if(getEyeValue()>12){//ball detected, go to ball
-          int ballAngle = getEyeAngle();
-          if(ballAngle>180){
-            ballAngle = constrain(ballAngle, 340, 359);
-          }
-          else{
-            ballAngle = constrain(ballAngle, 0, 20);
-          }
-          setDir(ballAngle);
-        }
-        else{//nope, go opposite of goal
-          setDir((getHomeAngle()+180)%360);
-        }
-      }
-      else{
-        if(homeDetected()){
-          setDir(getHomeAngle());
-          int backSpeed = (getHomeDistance()-20)/2;
-          backSpeed = constrain(backSpeed, 20, 25);
-          setSpeed(15);
-        }
-        else{
-          goToCoordinate(0,-220);
-          setSpeed(constrain(getSpeed(),20,30));
-        }
-        // setDir(getHomeAngle());
-        // setSpeed(backSpeed);
-      }
-    }
-    else{
-      setSpeed(20);
-      if(1){//(getUltraBack()<100){
-        if(lastGoalAngle>180){
-          setDir(270);
-        }
-        else{
-          setDir(90);
-        }
-      }
-      // else{
-      //   goToCoordinate(0,-220);
-      //   setSpeed(constrain(getSpeed(),20,30));
-      // }
-    }
-  }
-  }
-
+  // if (ballAhead)
+  // {
+  //   if (ballTimer == 0){
+  //     ballTimer = millis();
+  //   }         // start
+  //   if (millis() - ballTimer >= 2000)                 // 2 s reached
+  //   {
+  //       goToBallPID();                                // ❶ chase ball                                 // done this tick
+  //   }
+  // } 
+  // else {
+  //   ballTimer = 0;                                    // reset timer
+  // }
+  // whiteMove(getDefenseDir());
 }
 
 
-void whiteMove(int dir){
-  double magnitude = getMagnitude();
-  magnitude = constrain(magnitude, -1.0, 1.0);
+void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
+{
+  /* 1. White-line vector (robot frame) ----------------------- */
+  double mag     = getMagnitude();          // 0 … 1
+  double wlAngle = getWhiteAngle();         // 0 … 359 (robot frame)
 
-  if (abs(getAngleDif(getRawWhiteAngle(),getHomeAngle()))>abs(getAngleDif((getRawWhiteAngle()+180)%360,getHomeAngle()))){
-    magnitude = abs(magnitude)*-1;
-  }
-  else
-  {
-    magnitude = abs(magnitude);
-  }
-  double offset = 0;
-  double maxOffset = 20.0;
-  if(abs(getAngleDif(whiteDir,180))>30){
-    maxOffset = 35.0;
-  }
-  if (dir != 360)
-  {
-    offset = magnitude * maxOffset;//TUNE 25.0
-  }
+  double wx = 0.3 * mag * sin(toRadian(wlAngle)); // X: East+
+  double wy = 0.3 * mag * cos(toRadian(wlAngle)); // Y: North+
 
-  if (dir > 180){
-    offset *=-1;
-  }
+  /* 2. Drive vector (robot frame) ---------------------------- */
+  double dx = sin(toRadian(dir));           // ±1
+  double dy = cos(toRadian(dir));           // 0
 
-  double finalAngle = dir + offset;
+  /* 3. Vector addition -------------------------------------- */
+  double fx = wx + dx;
+  double fy = wy + dy;
 
-  setDir(finalAngle);
-}
+  /* 4. Robot-frame heading ---------------------------------- */
+  finalHeading = atan2(fx, fy) * 180.0 / PI;   // −180 … +180
+  finalHeading = fmod(finalHeading + 360.0, 360.0);   // 0 … 359.999
 
-int getDefenseDir(){
-  int defenseDir = 0;
-  double magnitude = getMagnitude();
-  magnitude = constrain(magnitude, -1.0, 1.0);
-  int ballAngle = -1;
+  /* 5. Convert to field frame with compass ------------------ */
+  finalHeading = fmod(finalHeading + getCompass(), 360.0);
 
-  whiteDir = (getRawWhiteAngle()+getCompass())%360;
-  if(abs(getAngleDif(whiteDir,getHomeAngle()))>abs(getAngleDif((whiteDir+180)%360,getHomeAngle()))){
-    whiteDir=(whiteDir+180)%360;
-  }
-  if(0){//(abs(getAngleDif(180, whiteDir))<40){
-    ballAngle = int((getEyeAngle()+getCompass()-(whiteDir-180)*1.5))%360;
-  }
-  else{
-    ballAngle = (getEyeAngle()+getCompass())%360;
-  }
+  setDir(finalHeading);                                // field-absolute
 
-  int moveAngle = 0;
-  if (ballAngle>180){ //left
-    moveAngle = 90;
-  }
-  else{
-    moveAngle = 270;
-  }
-  defenseDir = (whiteDir+moveAngle)%360;
-
-  //Speed controls
-
-  double cornerRatio = 1-abs(getAngleDif(whiteDir, 180))/20.0;//30.0
-  cornerRatio = constrain(cornerRatio, 0.00, 1.0);
-
-  if ((getEyeAngle() > 180 && whiteDir > 180 && getEyeAngle() < 345) || (getEyeAngle() < 180 && whiteDir < 180 && getEyeAngle() > 15)){
-    cornerRatio = 1.0;
-  }
-
-  if ((getEyeAngle() > 180 && whiteDir > 200) || (getEyeAngle() < 180 && whiteDir < 160)){
-    cornerRatio = 0.4;
-  }
+  double goalRatio = abs(getAngleDif(180, getHomeAngle())) / 30.0;
+  goalRatio = constrain(goalRatio, 0.2, 1.0);
 
   double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;//90.0
   angleRatio = constrain(angleRatio, 0.0,1.0);
 
-  double distRatio = getEyeValue()/200.0;
-  distRatio = constrain(distRatio,0.8,1.0);
+  // double distRatio = getEyeValue()/200.0;
+  // distRatio = constrain(distRatio,0.8,1.0);
 
-  defenseSpeedOffset = cornerRatio*angleRatio*80;//120
+  setSpeed(angleRatio*goalRatio*40);
+}
 
-  if (whiteDir < 160 && (getEyeAngle() > 180||getEyeAngle()<=20)){
-    defenseDir = 90;
-    defenseSpeedOffset = 15;
-  }
-  else if(whiteDir > 200 && (getEyeAngle() < 180||getEyeAngle()>=340)){
-    defenseDir = 270;
-    defenseSpeedOffset = 15;
-  }
-  // if ((whiteDir < 160 && (getEyeAngle() > 180||getEyeAngle()<=20)) || (whiteDir > 200 && (getEyeAngle() < 180||getEyeAngle()>=340))){ //reached end of white line
-  //   defenseDir = (defenseDir+180)%360; //moving back 
-  //   defenseSpeedOffset = 10;
-  // }
-  // defenseSpeedOffset = 40;
-  return defenseDir;
+bool isCorner(int angle, int CORNER_TH)
+{
+    static const int kCorner[4] = {45, 135, 225, 315};
+
+    for (int i = 0; i < 4; i++)
+        if (abs(getAngleDif(angle, kCorner[i]) ) < CORNER_TH)
+            return true;
+    return false;
 }
 
 
+int getDefenseDir()
+{
+  int whiteDir = getWhiteAngle();
+  int ballAngle = getEyeAngle();
+  /* 1.  Decide which side the ball is on --------------------- */
+  int moveAngle;                   // +90° = right (east), +270° = left (west)
+  if (ballAngle > 180) {           // ball on the left (west) side
+      moveAngle = 270;
+  } else {                         // ball on the right (east) side
+      moveAngle = 90;
+  }
 
-void resetVariables(){
-  firstHasBall = -1;
-  gettingBall = false;
-  firstBallFront = -1;
-  firstGettingBall = -1;
-}
-
-void blockGoalie(){
-  if (defenseReached == 0){
-    defenseReached = 1;
+  /* 2.  Add or subtract the offset, depending on whiteDir ---- */
+  int defenseDir;
+  if (whiteDir > 90 && whiteDir < 270) {
+      // stripe normal points forward → add the offset
+      defenseDir = (whiteDir + 360 - moveAngle) % 360;  // (whiteDir - moveAngle) wrapped
+  } else {
+      // stripe normal points backward → subtract the offset
+      defenseDir = (whiteDir + moveAngle) % 360;
   }
-  if (defenseReached == 1){
-    setAngleThres(20);
-    int tempOffset = (getUltraLeft() - getUltraRight())*0.5;
-    setDir((0 - tempOffset + 360)%360);
-    int tempBlockSpeed = 40 - ((millis() - lastDefenseReached)/80);
-
-    tempBlockSpeed = constrain(tempBlockSpeed, 15, 40);
-    setSpeed(tempBlockSpeed);
-    if (whiteDetected() && millis() - lastDefenseReached > 500){
-      defenseReached = 2;
-    }
-  }
-  else if (defenseReached == 2){
-    if (getMagnitude() > 0){
-      setDir(0);
-      setSpeed(12);
-    }
-    else
-    {
-      setDir(180);
-      setSpeed(12);
-    }
-    
-    if (getMagnitude() < 0.2 && getMagnitude() > -0.2){
-      lastDefenseReached = millis();
-      defenseReached = 3;
-    }
-  }
-  else if (defenseReached == 3){
-    setSpeed(30);
-    if (getUltraLeft() < 50){
-      whiteMove((getWhiteAngle() + 270)%360);
-    }
-    else if (getUltraRight() < 50){
-      whiteMove((getWhiteAngle() + 90)%360);
-    }
-    else{
-      setDir(STOP);
-    }
-    if (millis() - lastDefenseReached > 10000){
-      defenseReached = 4;
-    }
-  }
-  else if (defenseReached == 4){
-    setDir(180);
-    setSpeed(20);
-    if (!whiteDetected()){
-      defenseReached = 0;
-    }
-  }
-  // if(whiteDetected()&&getUltraFront()>80){
-  //   int whiteAngle = (getWhiteAngle()+getCompass())%360;
-  //   if(whiteAngle<5&&whiteAngle>355){
-  //     setDir(STOP);
-  //   }
-  //   else{
-  //     if(whiteAngle>180){
-  //       whiteMove(90+whiteAngle);
-  //     }
-  //     else{
-  //       whiteMove(270+whiteAngle);
-  //     }
-  //   }
-  // }
-  // else{
-  //   goToCoordinate(0, 200);
-  // }
-
-}
-
-void blockGoalie1(){
-  int targetFront = 90;
-
-  if (defenseReached == 0){
-    defenseReached = 1;
-  }
-  if (defenseReached == 1){
-    setAngleThres(20);
-    int tempOffset = (getUltraLeft() - getUltraRight())*0.5;
-    setDir((0 - tempOffset + 360)%360);
-    int tempBlockSpeed = 40 - ((millis() - lastDefenseReached)/80);
-
-    tempBlockSpeed = constrain(tempBlockSpeed, 15, 40);
-    setSpeed(tempBlockSpeed);
-    if (whiteDetected() && millis() - lastDefenseReached > 500 && getUltraFront()<90){
-      defenseReached = 2;
-    }
-  }
-  else if (defenseReached == 2){
-
-    if (getUltraFront() > targetFront){
-      setDir(0);
-      setSpeed(20);
-    }
-    else
-    {
-      setDir(180);
-      setSpeed(20);
-    }
-    
-    if (getUltraFront() < targetFront+5 && getUltraFront() > targetFront-5){
-      lastDefenseReached = millis();
-      defenseReached = 3;
-    }
-  }
-  else if (defenseReached == 3){
-    setSpeed(30);
-    if (getUltraLeft() < 50){
-      setDir((270)%360);
-    }
-    else if (getUltraRight() < 50){
-      setDir((90)%360);
-    }
-    else{
-      setDir(STOP);
-    }
-    if (millis() - lastDefenseReached > 10000){
-      defenseReached = 4;
-    }
-  }
-  else if (defenseReached == 4){
-    setDir(180);
-    setSpeed(20);
-    if (!whiteDetected()){
-      defenseReached = 0;
-    }
-  }
-  // if(whiteDetected()&&getUltraFront()>80){
-  //   int whiteAngle = (getWhiteAngle()+getCompass())%360;
-  //   if(whiteAngle<5&&whiteAngle>355){
-  //     setDir(STOP);
-  //   }
-  //   else{
-  //     if(whiteAngle>180){
-  //       whiteMove(90+whiteAngle);
-  //     }
-  //     else{
-  //       whiteMove(270+whiteAngle);
-  //     }
-  //   }
-  // }
-  // else{
-  //   goToCoordinate(0, 200);
-  // }
-
+  return defenseDir;               // 0‒359°
 }

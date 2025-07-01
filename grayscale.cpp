@@ -42,8 +42,7 @@ double yDistance = 0;
 
 // --- Corner Detection ---
 int cornerCounter = 0;
-// bool inCorner = false;
-// std::queue<int> pastWhites;  // Unused but declared
+std::queue<int> pastWhites;  // Unused but declared
 
 // --- Threshold Calibration ---
 int calibrationTimer = 0;
@@ -53,6 +52,8 @@ const double sensitivity = 0.30;  // Lower means more detection of white
 double whiteLineKp = 5.0, whiteLineKi = 0.0, whiteLineKd = 0.0;
 double whiteLineSetPoint, whiteLineInput, whiteLineOutput;
 PID whiteLinePID(&whiteLineInput, &whiteLineOutput, &whiteLineSetPoint, whiteLineKp, whiteLineKi, whiteLineKd, DIRECT);
+
+int rawAngle = 0;
 
 // === Initialization ===
 void initSensors() {
@@ -161,13 +162,12 @@ void processSensors() {
 }
 
 void processWhiteAngle(){
+  double xSum = 0;
+  double ySum = 0;
   double xClusterSum[16] = {0};
   double yClusterSum[16] = {0};
   double clusterAngle[16] = {0};
-  double sensorAngle[sensorSize] = {0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345};
   double length = 1;
-  double xSum = 0;
-  double ySum = 0;
 
   int clusterCount = 0;
 
@@ -187,7 +187,6 @@ void processWhiteAngle(){
     }
   }
 
-  //Count last cluster
   if (sensorWhite[31])
   {
     clusterCount++;
@@ -215,18 +214,32 @@ void processWhiteAngle(){
 
   }
 
-  for (int c = 0; c < clusterCount; c++)
+
+  //UNIT VECTOR SUMMATION
+
+  for (int j = 0; j < clusterCount; j++)
   {
-    xSum += xClusterSum[c];
-    ySum += yClusterSum[c];
+      double len = hypot(xClusterSum[j], yClusterSum[j]);
+      if (len < 1e-6)                   // degenerate blob → ignore
+          continue;
+
+      xSum += xClusterSum[j] / len;     // unit-length contribution
+      ySum += yClusterSum[j] / len;
   }
 
-  double rawAngle = atan2(xSum,ySum) * 180/3.14;
+  if (clusterCount > 0)
+  {
+      xSum /= clusterCount;             // equal weight per blob
+      ySum /= clusterCount;
+  }
 
-  rawAngle = (int(rawAngle) + 360)%360;
+  magnitude = hypot(xSum, ySum);          // 0 … 1
+  rawAngle  = atan2(xSum, ySum) * 180.0 / PI;
+  rawAngle = ((int)rawAngle - 90 + 360)%360;       // 0 … 360
+}
 
-  int finalAngle = rawAngle;
-  if(!whiteDetected()){
+int getWhiteAngleFlip(){
+    if(!whiteDetected()){
     firstFlip=true;
   }
   else{
@@ -244,26 +257,13 @@ void processWhiteAngle(){
     flip = 0;
   }
   
-  whiteAngle = ((finalAngle+180*flip)+270)%360;
-  if (abs(xSum) < 0.01 && abs(ySum) < 0.01)
-  {
-    whiteAngle = previousWhiteAngle;
-  }
+  whiteAngle = ((rawAngle+180*flip)+270)%360;
+  // if (abs(xSum) < 0.01 && abs(ySum) < 0.01)
+  // {
+  //   whiteAngle = previousWhiteAngle;
+  // }
 
-  magnitude = (sqrt(pow(xSum,2) + pow(ySum,2)));
-  if (flip)
-  {
-    magnitude = magnitude * -1;
-  }
-
-  previousWhiteAngle = whiteAngle;
-
-  lastAngle = rawAngle;
-
-  whiteLineInput = abs(xSum) + abs(ySum);
-  whiteLinePID.Compute();
-  xDistance = xSum;
-  yDistance = ySum;
+  return whiteAngle;
 }
 
 // --- Printing ---
@@ -380,10 +380,9 @@ int getFirstWhiteAngle() { return firstWhiteAngle; }
 bool getFirstWhite()     { return firstWhite; }
 bool whiteDetected()     { return touchWhite; }
 int getWhiteCountHistory() { return whiteCountHistory; }
-int getWhiteAngle()      { return whiteAngle; }
-int getRawWhiteAngle()   { return (whiteAngle + 180 * flip) % 360; }
+int getWhiteAngle()      { return rawAngle; }
 bool getFlip()           { return flip; }
 double getMagnitude()    { return magnitude; }
 double getXSum()         { return xDistance; }
 double getYSum()         { return yDistance; }
-// bool getInCorner()       { return inCorner; }
+bool getInCorner()       { return inCorner; }
