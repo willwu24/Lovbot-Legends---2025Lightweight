@@ -9,3 +9,6 @@ git add .
 git commit -m "message"
 git push origin main
 
+
+"To get rid of local changes"
+git restore .
