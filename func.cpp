@@ -3,7 +3,7 @@
 // PID variables
 
 double motorCorrectionKp = 0.32, motorCorrectionKi = 0.00, motorCorrectionKd = 0.00;
-double motorTurningKp = 0.32, motorTurningKi = 0.00, motorTurningKd = 0.00;
+double motorTurningKp = 0.26, motorTurningKi = 0.00, motorTurningKd = 0.00;
 double motorSetpoint, motorInput, motorCorrectionOutput, motorTurningOutput;
 
 PID motorCorrectionPID(&motorInput, &motorCorrectionOutput, &motorSetpoint, motorCorrectionKp, motorCorrectionKi, motorCorrectionKd, DIRECT);

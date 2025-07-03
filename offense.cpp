@@ -26,7 +26,7 @@ bool turnSet = false;
 void offenseMain() {
   retrieveKicker();
   setTurningMode(1);
-  setAngleThres(45);
+  setAngleThres(30);
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
@@ -43,7 +43,7 @@ void offenseMain() {
 
     setDir(dirAngle);
     if (!getFlip()){
-      setSpeed(60);
+      setSpeed(50);
     }
     else
     {
@@ -66,7 +66,7 @@ void offenseMain() {
 
     if(hasBall()){
       lastTargetSet = millis();
-      if (millis() - lastAround > 150){
+      if (millis() - lastAround > 100){
         kick();
       }
       goToBallPID();
@@ -86,10 +86,10 @@ void offenseMain() {
       setTarget(0);
       goToBallPID();
       applyAirWall();
-      if(inCorner()){
-        setDir(STOP);
-        changeSendArr(0, 1);
-      }
+      // if(inCorner()){
+      //   setDir(STOP);
+      //   changeSendArr(0, 1);
+      // }
     }
   }
 }

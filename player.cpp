@@ -27,13 +27,10 @@ void player() {
     displayUpdate();
     getCameraData();
     processSensors();
-    processDFUltraTrig();
+    // processDFUltraTrig();
     getCoordinate();
-    transmitData();
-    receiveData();
-
-    //printSensorsThres();
-    // Serial.println(" ");
+    // transmitData();
+    // receiveData();
 
     setLED();
     checkButton();
@@ -43,11 +40,10 @@ void player() {
     if (getRobotRole() == OFFENSE) {
       processWhiteAngleOffense();
       offenseMain();
+      // Serial.println(getEyeValueSmooth());
     } else {
       processWhiteAngle();
-      // defenseMain();
       defenseMain();
-      // setMotors(20,20,20,20);
     }
     //goToCoordinate(0, 0);
     // === Actuation ===
