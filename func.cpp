@@ -2,8 +2,8 @@
 
 // PID variables
 
-double motorCorrectionKp = 0.11, motorCorrectionKi = 0.00, motorCorrectionKd = 0.00;
-double motorTurningKp = 0.16, motorTurningKi = 0.00, motorTurningKd = 0.00;
+double motorCorrectionKp = 0.32, motorCorrectionKi = 0.00, motorCorrectionKd = 0.00;
+double motorTurningKp = 0.32, motorTurningKi = 0.00, motorTurningKd = 0.00;
 double motorSetpoint, motorInput, motorCorrectionOutput, motorTurningOutput;
 
 PID motorCorrectionPID(&motorInput, &motorCorrectionOutput, &motorSetpoint, motorCorrectionKp, motorCorrectionKi, motorCorrectionKd, DIRECT);
@@ -16,8 +16,8 @@ int turnSpeed = 7;
 double motorChange = 3;
 int turningMode = 1;
 int motorMode = 0;
-int MIN_TURNING_SPEED = 6;
-int MAX_TURNING_SPEED = 25;
+int MIN_TURNING_SPEED = 10;
+int MAX_TURNING_SPEED = 40;
 
 int currSpeed[5] = {0};
 int tarSpeed[5] = {0};

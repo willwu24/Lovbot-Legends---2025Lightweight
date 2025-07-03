@@ -6,7 +6,7 @@
 #define ULTRA_NUM 4
 
 // Ultrasonic pins:      Front, Right, Back, Left
-int trigechoPin[ULTRA_NUM] = {A9, A13, A7, A12};
+int trigechoPin[ULTRA_NUM] = {A9, A13, A7, A8};
 
 int pastReadings[5] = {0,0,0,0};
 

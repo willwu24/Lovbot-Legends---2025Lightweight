@@ -162,7 +162,7 @@ static void drawLight()
 
     getWhiteSensor(ring);
     
-    int   ang = getWhiteAngle();              // whiteAngle
+    int   ang = getWhiteAngleOffense();              // whiteAngle
     float avg = getSensitivity(), mag = getMagnitude();
 
     const int16_t cx = 32, cy = 38, R = 23;   // ring radius fits under title

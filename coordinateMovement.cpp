@@ -1,7 +1,7 @@
 #include "coordinateMovement.h"
 
 // Speed control
-int minSpeed = 20;
+int minSpeed = 15;
 int maxSpeed = 40;
 
 // Parking parameters
@@ -34,7 +34,8 @@ void goToCoordinate(int tarX, int tarY){
   targetCO.posY = tarY;
 
   if ((getSpeed() < 5 || getDir() == 360) && parking) {
-    return;
+    // return;
+    setDir(STOP);
   }
 
   if (currCO.isXBlocked || currCO.isYBlocked) {

@@ -27,5 +27,7 @@ void blockGoalie();
 
 void blockGoalie1();
 
+int getHomeDir();
+
 
 #endif  // DEFENSE_H
