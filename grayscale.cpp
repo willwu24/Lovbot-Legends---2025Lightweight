@@ -237,35 +237,6 @@ void processWhiteAngle(){
   rawAngle  = atan2(xSum, ySum) * 180.0 / PI;
   rawAngle = ((int)rawAngle - 90 + 360)%360;       // 0 … 360
 }
-
-int getWhiteAngleFlip(){
-    if(!whiteDetected()){
-    firstFlip=true;
-  }
-  else{
-
-    if(firstFlip){
-      firstFlip = false;
-    }
-    else if (whiteDetected() && abs(getLightDif(lastAngle, rawAngle)) > 120)
-    {
-      flip = !flip;
-      lastWhiteTime = millis();
-    }
-  }
-  if(!whiteDetected() && millis()-lastWhiteTime>3000){
-    flip = 0;
-  }
-  
-  whiteAngle = ((rawAngle+180*flip)+270)%360;
-  // if (abs(xSum) < 0.01 && abs(ySum) < 0.01)
-  // {
-  //   whiteAngle = previousWhiteAngle;
-  // }
-
-  return whiteAngle;
-}
-
 // --- Printing ---
 
 void printSensorsThres(){
@@ -374,6 +345,116 @@ void getWhiteSensor(bool output[32]){
 
 int getSensitivity(){
   return sensitivity;
+}
+
+void processWhiteAngleOffense(){
+  double xClusterSum[16] = {0};
+  double yClusterSum[16] = {0};
+  double clusterAngle[16] = {0};
+  double sensorAngle[sensorSize] = {0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345};
+  double length = 1;
+  double xSum = 0;
+  double ySum = 0;
+
+  int clusterCount = 0;
+
+  for (int i = 0; i < 32; i++)
+  {
+    if (sensorWhite[i])
+    {
+      xClusterSum[clusterCount] += sin(toRadian(360/sensorSize*i));
+      yClusterSum[clusterCount] += cos(toRadian(360/sensorSize*i));
+    }
+    else
+    {
+      if (sensorWhite[i-1] && !sensorWhite[i])
+      {
+        clusterCount++;
+      }
+    }
+  }
+
+  //Count last cluster
+  if (sensorWhite[31])
+  {
+    clusterCount++;
+  }
+
+  if (sensorWhite[0] && sensorWhite[31])//connect two ends?
+  {
+    xClusterSum[0] += xClusterSum[clusterCount-1];
+    yClusterSum[0] += yClusterSum[clusterCount-1];
+
+    xClusterSum[clusterCount-1] = 0;
+    yClusterSum[clusterCount-1] = 0;
+    clusterCount = clusterCount - 1;
+  }
+
+  for (int j = 0; j < 16; j++)
+  {
+    double clusterLength = sqrt(pow(xClusterSum[j],2)+pow(yClusterSum[j],2));//make it regular length
+
+    xClusterSum[j] = xClusterSum[j]/clusterLength;
+    yClusterSum[j] = yClusterSum[j]/clusterLength;
+
+    clusterAngle[j] = atan2(xClusterSum[j],yClusterSum[j]);
+    clusterAngle[j] = clusterAngle[j] * (180/3.14);
+
+  }
+
+  for (int c = 0; c < clusterCount; c++)
+  {
+    xSum += xClusterSum[c];
+    ySum += yClusterSum[c];
+  }
+
+  double rawAngle = atan2(xSum,ySum) * 180/3.14;
+
+  rawAngle = (int(rawAngle) + 360)%360;
+
+  int finalAngle = rawAngle;
+  if(!whiteDetected()){
+    firstFlip=true;
+  }
+  else{
+
+    if(firstFlip){
+      firstFlip = false;
+    }
+    else if (whiteDetected() && abs(getLightDif(lastAngle, rawAngle)) > 120)
+    {
+      flip = !flip;
+      lastWhiteTime = millis();
+    }
+  }
+  if(!whiteDetected() && millis()-lastWhiteTime>3000){
+    flip = 0;
+  }
+  
+  whiteAngle = ((finalAngle+180*flip)+270)%360;
+  if (abs(xSum) < 0.01 && abs(ySum) < 0.01)
+  {
+    whiteAngle = previousWhiteAngle;
+  }
+
+  magnitude = (sqrt(pow(xSum,2) + pow(ySum,2)));
+  if (flip)
+  {
+    magnitude = magnitude * -1;
+  }
+
+  previousWhiteAngle = whiteAngle;
+
+  lastAngle = rawAngle;
+
+  whiteLineInput = abs(xSum) + abs(ySum);
+  whiteLinePID.Compute();
+  xDistance = xSum;
+  yDistance = ySum;
+}
+
+int getWhiteAngleOffense(){
+  return whiteAngle;
 }
 
 int getFirstWhiteAngle() { return firstWhiteAngle; }

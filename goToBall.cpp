@@ -89,7 +89,7 @@ void goToBallPID(){
 
   double finalDirection = ballDir + offset;
   setDir(finalDirection);
-  setSpeed(60);
+  setSpeed(80);
 
   if (ballDist < 12) { // Adjust condition for reset based on new range
       resetBallPID();

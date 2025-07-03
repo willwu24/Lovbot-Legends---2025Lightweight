@@ -50,7 +50,8 @@ int getWhiteCountHistory();
 // Angle & Direction
 // ------------------------------
 int getWhiteAngle();
-int getWhiteAngleFlip();
+void processWhiteAngleOffense();
+int getWhiteAngleOffense();
 bool getFlip();
 void getEEPROMThreshold();
 // void setFlip(bool a);           // Uncomment if implemented
@@ -69,6 +70,5 @@ void getWhiteSensor(bool output[32]);
 
 int getSensitivity();
 
-void processFlip();
 
 #endif // GRAYSCALE_H

@@ -7,29 +7,45 @@ int ballTimer = 0;
 double finalHeading;
 
 void defenseMain(){
-  setAngleThres(12);
-  if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1000){
-    setSpeed(15);
+  setAngleThres(20);
+  if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1500){
+    setSpeed(40);
     setDir(lastWhiteDir);
   }
   else if (!whiteDetected()){
-    goToCoordinate(0,0);
+    if (lastWhiteDir < 90 || lastWhiteDir > 270){
+      setDir(0);
+      setTarget(0);
+      setSpeed(40);
+    }
+    else if (homeDetected()){
+      setDir(getHomeAngle());
+      setTarget(0);
+      setSpeed(40);
+      // goToCoordinate(0,-100);
+    }
+    else
+    {
+      goToCoordinate(0,-100);
+    }
   }
   else
   {
     int tempCorner = (getDefenseDir() + getCompass())%360;
-    if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
+    if (getEyeValue() < 12){
+      whiteMove(getHomeDir());
+      setSpeed(abs(getAngleDif(180,getHomeAngle())) * 0.5);
+    }
+    else if ((tempCorner > 130 && tempCorner < 190) || (tempCorner < 230 && tempCorner > 170) || (!homeDetected()))
     {
       whiteMove((getDefenseDir() + 180)%360);
-      lastWhiteDir = getWhiteAngle();
-      lastDefenseWhiteTime = millis();
     }
     else
     {
       whiteMove(getDefenseDir());
-      lastWhiteDir = getWhiteAngle();
-      lastDefenseWhiteTime = millis();
     }
+    lastWhiteDir = getWhiteAngle();
+    lastDefenseWhiteTime = millis();
   }
 
   // bool ballAhead = whiteDetected() && ((getEyeAngle() < 45) || (getEyeAngle() > 315)) &&  (getEyeValue() > 150);
@@ -58,11 +74,11 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   double wlAngle = getWhiteAngle();         // 0 … 359 (robot frame)
   int tempCorner = (getDefenseDir() + getCompass())%360;
 
+  double defenseTuning = min(abs(getAngleDif(180,tempCorner)), abs(getAngleDif(0,tempCorner)))/90.0;
 
-
-  double defenseTuning = min(abs(getAngleDif(180,tempCorner), abs(getAngleDif(0,tempCorner))))/90.0;
-  defenseTuning = constrain(defenseTuning, 0.2, 1.0);
-
+  defenseTuning = 1.0 - defenseTuning;
+  defenseTuning = constrain(defenseTuning, 0.1, 1.0);
+  defenseTuning = map(defenseTuning, 0.10,1.0,0.20,1.0);
 
   double wx = defenseTuning * mag * sin(toRadian(wlAngle)); // X: East+
   double wy = defenseTuning * mag * cos(toRadian(wlAngle)); // Y: North+
@@ -89,14 +105,21 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   goalRatio = 1.0 - goalRatio;
 
   double cornerRatio;
+  // double cornerRatio = min(abs(getAngleDif(180,tempCorner)), abs(getAngleDif(0,tempCorner)))/90.0;
+  // cornerRatio = 1.0 - cornerRatio;
+  // cornerRatio = constrain(cornerRatio, 0.2, 1.0);
+  // Serial.println(cornerRatio);
+  // defenseTuning = map(defenseTuning, 0.2,1.0,0.2,1.0);
+
   if (getEyeAngle() > 180){
-    cornerRatio = (270 - tempCorner) / 30;
+    cornerRatio = (270 - tempCorner) / 20.0;
   }
   else{
-    cornerRatio = (tempCorner - 90) / 30;
+    cornerRatio = (tempCorner - 90) / 20.0;
   }
   cornerRatio = constrain(cornerRatio, 0.0, 1.0);
   cornerRatio = 1.0-cornerRatio;
+
 
   int defenseGoalAngle = (getHomeAngle() + getCompass())%360;
 
@@ -105,17 +128,21 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   }
 
   double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;//90.0
-  angleRatio = constrain(angleRatio, 0.0,1.0);
+  angleRatio = constrain(angleRatio, 0.0,0.6);
+  angleRatio = 1.0 - (exp(2.0 * (1.0 - angleRatio)) - 1.0) / (exp(2.0) - 1.0);   // high slope near 0, flat near 1
+
 
   // double distRatio = getEyeValue()/200.0;
   // distRatio = constrain(distRatio,0.8,1.0);
-  if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
+  if ((tempCorner > 130 && tempCorner < 190) || (tempCorner < 230 && tempCorner > 170))
   {
-    setSpeed(20);
+    setSpeed(30);
   }
-  else{
-    setSpeed(angleRatio*cornerRatio*40);
+  else
+  {
+    setSpeed(angleRatio*cornerRatio*100);
   }
+
 }
 
 bool isCorner(int angle, int CORNER_TH)
@@ -143,6 +170,43 @@ int getDefenseDir()
     /* --- 2. Choose ±90° offset based on ball side ------------ */
     int moveAngle;
     if (ballAngle > 180) {
+        moveAngle = 270;        // ball is left  → use left offset
+    } else {
+        moveAngle = 90;         // ball is right → use right offset
+    }
+
+    /* --- 3. Decide stripe orientation with hysteresis -------- */
+    static int stripeForward = 1;          // remember last state
+    const double tol = 0.1736;             // 10° dead-band
+    double yComp = cos(whiteDir * M_PI / 180.0);
+
+    if (yComp >  tol) stripeForward = 1;   // clearly forward
+    if (yComp < -tol) stripeForward = 0;   // clearly backward
+
+    /* --- 4. Preliminary heading (same formula as before) ----- */
+    int defenseDir;
+    if (stripeForward) {
+        defenseDir = (whiteDir + 360 - moveAngle) % 360;
+    } else {
+        defenseDir = (whiteDir + moveAngle) % 360;
+    }
+
+    /* --- 5. Flip 180° to stand on the correct side ----------- */
+    defenseDir = (defenseDir + 180) % 360;
+
+    return defenseDir;                     // 0–359°
+}
+
+int getHomeDir(){
+    /* --- 1. Normalise angles -------------------------------- */
+    int whiteDir = getWhiteAngle();
+    if (whiteDir < 0) whiteDir += 360;
+    whiteDir %= 360;
+
+
+    /* --- 2. Choose ±90° offset based on ball side ------------ */
+    int moveAngle;
+    if (getHomeAngle() > 180) {
         moveAngle = 270;        // ball is left  → use left offset
     } else {
         moveAngle = 90;         // ball is right → use right offset

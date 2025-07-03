@@ -54,7 +54,7 @@ static posInfo currPosition;
 #define BACK    2
 #define LEFT    3
 
-#define MAX_SPEED  90
+#define MAX_SPEED  120
 #define STOP       360   // Representation of stop in move()
 #define BLOCKED    361   // Representation of blocked in move()
 
@@ -69,7 +69,7 @@ const int thresHoldv = V_SIZE-toleranceV;
 // -------------------------- Pin Configuration --------------------------
 
 static const int LAZER_PIN       = A6;
-static const int SHOOT_PIN       = A8;
+static const int SHOOT_PIN       = A12;
 static const int BUTTON_PIN[]    = {10, 11, 12, 30, 31};
 // static const int DRIBBLER_PIN_1  = A9;
 

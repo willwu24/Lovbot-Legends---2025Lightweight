@@ -15,7 +15,7 @@ void player() {
   Serial.print("Player");
   // === Initialization ===
   setAttackMode(BLUE);     // Set goal to shoot on
-  setRobotRole(DEFENSE);     // Set initial role
+  setRobotRole(OFFENSE);     // Set initial role
   setupVariables();
   // while(1){
   //   setMotors(20,20,-20,-20);
@@ -24,10 +24,9 @@ void player() {
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    // displayUpdate();
+    displayUpdate();
     getCameraData();
     processSensors();
-    processWhiteAngle();
     processDFUltraTrig();
     getCoordinate();
     transmitData();
@@ -42,15 +41,13 @@ void player() {
 
     // === Role Handling ===
     if (getRobotRole() == OFFENSE) {
+      processWhiteAngleOffense();
       offenseMain();
     } else {
+      processWhiteAngle();
       // defenseMain();
       defenseMain();
-      Serial.print(getEyeAngle());
-      Serial.print(" ");
-      Serial.print(getDir());
-      Serial.print(" ");
-      Serial.println(getDefenseDir());
+      // setMotors(20,20,20,20);
     }
     //goToCoordinate(0, 0);
     // === Actuation ===

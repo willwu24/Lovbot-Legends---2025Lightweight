@@ -37,17 +37,17 @@ void offenseMain() {
     setMotorMode(0);
     resetBallPID();
 
-    int dirAngle = (getWhiteAngle() + 180) % 360;
+    int dirAngle = (getWhiteAngleOffense() + 180) % 360;
     lastWhite = millis();
     lastWhiteAngle = dirAngle;
 
     setDir(dirAngle);
     if (!getFlip()){
-      setSpeed(30);
+      setSpeed(60);
     }
     else
     {
-      setSpeed(35);
+      setSpeed(70);
     }
   }
 
