@@ -13,14 +13,19 @@ int lastHasBall = 0;
 int targetSet = 0;
 int lastTargetSet = 0;
 
+int blockGoalieSide = 0;
+
 int lastAround = 0;
 
-const int frontStart = 200, frontStop = 20, frontReverse = 0;
+static unsigned long timer = 0;
+
+const int frontStart = 200, frontStop = 40, frontReverse = 0;
 const int backStart = 220, backStop = 90, backReverse = 0;
 const int leftStart = 180, leftStop = 50, leftReverse = 0;
 const int rightStart = 180, rightStop = 50, rightReverse = 0;
 
 bool turnSet = false;
+
 
 // === Main Offense Control ===
 void offenseMain() {
@@ -29,9 +34,8 @@ void offenseMain() {
   setAngleThres(45);
 
   // === White Line Detected ===
+
   if (whiteDetected() && firstBall != 1) {
-    changeSendArr(0, 0);
-  // if (0){
     turnSet = false;
     setTarget(0);
     setMotorMode(0);
@@ -63,7 +67,17 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-
+    if(inCorner()){
+      if (blockGoalieSide == 1){
+        transmit(2); //left
+        setRobotRole(DEFENSE);
+      }
+      else
+      {
+        transmit(2);
+        setRobotRole(DEFENSE);
+      }
+    }
     if(hasBall()){
       lastTargetSet = millis();
       if (millis() - lastAround > 100){
@@ -73,7 +87,6 @@ void offenseMain() {
       applyAirWall();
     }
     else if (getEyeValueSmooth() < 12){
-      changeSendArr(0, 1);
       resetBallPID();
       targetSet = 0;
       setTarget(0);
@@ -86,10 +99,6 @@ void offenseMain() {
       setTarget(0);
       goToBallPID();
       applyAirWall();
-      // if(inCorner()){
-      //   setDir(STOP);
-      //   changeSendArr(0, 1);
-      // }
     }
   }
 }
@@ -168,6 +177,8 @@ void applyAirWall()
                                            backStart,  backStop,  backReverse);
     }
 
+
+
     /* 4. Apply the ratios (scale / stop / reverse) */
     x *= repelXRatio;
     y *= repelYRatio;
@@ -187,10 +198,25 @@ void applyAirWall()
     setDir(newDir);
 }
 
-bool inCorner(){
-  bool ballFront = getEyeAngle()<30||getEyeAngle()>330;
-  if(ballFront&&getUltraFront()<80&&(getUltraLeft()<90||getUltraRight()<90)&&getHomeDistance()>100){
-    return true;
+bool inCorner() {
+
+  bool ballFront = getEyeAngle() < 30 || getEyeAngle() > 330;
+  bool inCornerNow = ballFront && getUltraFront() < 80 && (getUltraLeft() < 80 || getUltraRight() < 80);
+
+  if (inCornerNow) {
+    if (millis() - timer >= 3000){
+      if (getUltraLeft() < getUltraRight()){
+        blockGoalieSide = 1;
+      }
+      else
+      {
+        blockGoalieSide = 2;
+      }
+      return true;
+    }
+  } else {
+    timer = millis();  // reset if condition breaks
   }
+
   return false;
 }

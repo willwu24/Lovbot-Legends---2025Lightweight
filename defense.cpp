@@ -7,6 +7,7 @@ int ballTimer = 0;
 double finalHeading;
 
 void defenseMain(){
+  transmit(2);
   setAngleThres(20);
   if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1500){
     setSpeed(40);

@@ -120,9 +120,17 @@ static void drawHome()
   }
   // centerPrint(,18);
 
-  oled.setTextSize(1);
-  oled.setTextColor(SSD1306_WHITE);
-  centerPrint("Attacking",42);
+  if (getRobotRole() == OFFENSE){
+    oled.setTextSize(1);
+    oled.setTextColor(SSD1306_WHITE);
+    centerPrint("OFFENSE",42);
+  }
+  else
+  {
+    oled.setTextSize(1);
+    oled.setTextColor(SSD1306_WHITE);
+    centerPrint("DEFENSE",42);
+  }
 }
 
 /* ===========================================================

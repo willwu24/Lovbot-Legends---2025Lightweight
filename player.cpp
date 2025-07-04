@@ -40,7 +40,6 @@ void player() {
     if (getRobotRole() == OFFENSE) {
       processWhiteAngleOffense();
       offenseMain();
-      // Serial.println(getEyeValueSmooth());
     } else {
       processWhiteAngle();
       defenseMain();
