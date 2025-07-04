@@ -15,8 +15,8 @@ int lastTargetSet = 0;
 
 int lastAround = 0;
 
-const int frontStart = 200, frontStop = 0, frontReverse = 0;
-const int backStart = 180, backStop = 70, backReverse = 0;
+const int frontStart = 200, frontStop = 20, frontReverse = 0;
+const int backStart = 220, backStop = 90, backReverse = 0;
 const int leftStart = 180, leftStop = 50, leftReverse = 0;
 const int rightStart = 180, rightStop = 50, rightReverse = 0;
 
@@ -26,7 +26,7 @@ bool turnSet = false;
 void offenseMain() {
   retrieveKicker();
   setTurningMode(1);
-  setAngleThres(30);
+  setAngleThres(45);
 
   // === White Line Detected ===
   if (whiteDetected() && firstBall != 1) {
