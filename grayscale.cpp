@@ -46,7 +46,7 @@ std::queue<int> pastWhites;  // Unused but declared
 
 // --- Threshold Calibration ---
 int calibrationTimer = 0;
-const double sensitivity = 0.30;  // Lower means more detection of white
+const double sensitivity = 0.25;  // Lower means more detection of white
 
 // --- PID Setup ---
 double whiteLineKp = 5.0, whiteLineKi = 0.0, whiteLineKd = 0.0;

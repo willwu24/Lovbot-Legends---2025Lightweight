@@ -120,9 +120,17 @@ static void drawHome()
   }
   // centerPrint(,18);
 
-  oled.setTextSize(1);
-  oled.setTextColor(SSD1306_WHITE);
-  centerPrint("Attacking",42);
+  if (getRobotRole() == OFFENSE){
+    oled.setTextSize(1);
+    oled.setTextColor(SSD1306_WHITE);
+    centerPrint("OFFENSE",42);
+  }
+  else
+  {
+    oled.setTextSize(1);
+    oled.setTextColor(SSD1306_WHITE);
+    centerPrint("DEFENSE",42);
+  }
 }
 
 /* ===========================================================
@@ -196,7 +204,7 @@ static void drawLight()
 static void drawEye()
 {
     int   ang  = getEyeAngle();            // eyeAngle
-    float dist = map(getEyeValue(),0,1000,1,0);          // eyeDistance 0-1
+    float dist = getEyeValue();      // eyeDistance 0-1
     uint8_t hit = (ang % 360) / 20;
 
     const int16_t cx = 32, cy = 35, R = 23;   // ring radius fits under title

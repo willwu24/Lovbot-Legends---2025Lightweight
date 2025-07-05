@@ -13,8 +13,8 @@ int dirDiff = maxDir - minDir;
 //---------------------------------------//
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
-double speedKp=1.1, speedKi=0.001, speedKd=0.001;// 0.74
-double dirKp=0.42, dirKi=0.05, dirKd=0.0;//0.01, 0.3, 0.004,                  0.24
+double speedKp=1.1, speedKi=0.000, speedKd=0.000;// 0.74
+double dirKp=0.24, dirKi=0.00, dirKd=0.07;//0.01, 0.3, 0.004,                  0.24
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
@@ -32,12 +32,12 @@ PID dirPID(&ballDist, &distanceRatio, &ballFarthest, dirKp, dirKi, dirKd, REVERS
 void setUpBallPID(){
     // Adjust initial closest distance according to new range
     if (getBotNum==0){
-      ballClosest = 250;
+      ballClosest = 200;
     }
     else{
-      ballClosest = 250; // Make sure to test this//250
+      ballClosest = 200; // Make sure to test this//250
     }
-    ballFarthest = 12;
+    ballFarthest = 20;
 
     speedPID.SetOutputLimits(PIDMinimum, PIDMaximum);
     speedPID.SetMode(AUTOMATIC);
@@ -89,20 +89,11 @@ void goToBallPID(){
 
   double finalDirection = ballDir + offset;
   setDir(finalDirection);
-  setSpeed(80);
+  setSpeed(90);
 
   if (ballDist < 12) { // Adjust condition for reset based on new range
       resetBallPID();
   }
-
-    Serial.print("speed: ");
-    Serial.print(getSpeed());
-    Serial.print("angle: ");
-    Serial.print(getEyeAngle());
-    Serial.print("value: ");
-    Serial.print(getEyeValue());
-    Serial.print("back: ");
-    Serial.println(speedRatio);
 }
 
 
