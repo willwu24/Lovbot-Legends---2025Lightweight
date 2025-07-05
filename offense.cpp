@@ -68,15 +68,15 @@ void offenseMain() {
   // === Default Behavior ===
   else {
     if(inCorner()){
-      if (blockGoalieSide == 1){
-        transmit(2); //left
-        setRobotRole(DEFENSE);
-      }
-      else
-      {
-        transmit(2);
-        setRobotRole(DEFENSE);
-      }
+      // if (blockGoalieSide == 1){
+      //   transmit(2); //left
+      //   setRobotRole(DEFENSE);
+      // }
+      // else
+      // {
+      //   transmit(2);
+      //   setRobotRole(DEFENSE);
+      // }
     }
     if(hasBall()){
       lastTargetSet = millis();

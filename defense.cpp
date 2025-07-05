@@ -7,7 +7,7 @@ int ballTimer = 0;
 double finalHeading;
 
 void defenseMain(){
-  transmit(2);
+  // transmit(2);
   setAngleThres(20);
   if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1500){
     setSpeed(40);
@@ -37,7 +37,7 @@ void defenseMain(){
       whiteMove(getHomeDir());
       setSpeed(abs(getAngleDif(180,getHomeAngle())) * 0.5);
     }
-    else if ((tempCorner > 130 && tempCorner < 190) || (tempCorner < 230 && tempCorner > 170) || (!homeDetected()))
+    else if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
     {
       whiteMove((getDefenseDir() + 180)%360);
     }
@@ -79,7 +79,7 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
 
   defenseTuning = 1.0 - defenseTuning;
   defenseTuning = constrain(defenseTuning, 0.1, 1.0);
-  defenseTuning = map(defenseTuning, 0.10,1.0,0.20,1.0);
+  defenseTuning = map(defenseTuning, 0.10,1.0,0.10,1.5);
 
   double wx = defenseTuning * mag * sin(toRadian(wlAngle)); // X: East+
   double wy = defenseTuning * mag * cos(toRadian(wlAngle)); // Y: North+
@@ -113,10 +113,10 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   // defenseTuning = map(defenseTuning, 0.2,1.0,0.2,1.0);
 
   if (getEyeAngle() > 180){
-    cornerRatio = (270 - tempCorner) / 20.0;
+    cornerRatio = (270 - tempCorner) / 25.0;
   }
   else{
-    cornerRatio = (tempCorner - 90) / 20.0;
+    cornerRatio = (tempCorner - 90) / 25.0;
   }
   cornerRatio = constrain(cornerRatio, 0.0, 1.0);
   cornerRatio = 1.0-cornerRatio;
@@ -129,13 +129,15 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   }
 
   double angleRatio = min(abs(getAngleDif(180, getEyeAngle())),abs(getAngleDif(0, getEyeAngle())))/90.0;//90.0
-  angleRatio = constrain(angleRatio, 0.0,0.6);
-  angleRatio = 1.0 - (exp(2.0 * (1.0 - angleRatio)) - 1.0) / (exp(2.0) - 1.0);   // high slope near 0, flat near 1
+  // angleRatio = constrain(angleRatio, 0.0,0.6);
+  // angleRatio = 1.0 - (exp(2.0 * (1.0 - angleRatio)) - 1.0) / (exp(2.0) - 1.0);   // high slope near 0, flat near 1
+  // angleRatio = 1.0 - angleRatio;
+  angleRatio = constrain(angleRatio, 0.35,1.0);
 
 
   // double distRatio = getEyeValue()/200.0;
   // distRatio = constrain(distRatio,0.8,1.0);
-  if ((tempCorner > 130 && tempCorner < 190) || (tempCorner < 230 && tempCorner > 170))
+  if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
   {
     setSpeed(30);
   }
@@ -144,6 +146,9 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
     setSpeed(angleRatio*cornerRatio*100);
   }
 
+  Serial.print(angleRatio);
+  Serial.print(" ");
+  Serial.println(getSpeed());
 }
 
 bool isCorner(int angle, int CORNER_TH)
@@ -169,12 +174,28 @@ int getDefenseDir()
     ballAngle %= 360;
 
     /* --- 2. Choose ±90° offset based on ball side ------------ */
+
+    // Step 2: Choose ±90° offset based on which side of the goal-to-ball line you're on
+    int ballBehind = (ballAngle + 180) % 360;
+    int diff = getAngleDif(getHomeAngle(), ballBehind);  // signed angle from goal to point behind ball
+
     int moveAngle;
-    if (ballAngle > 180) {
-        moveAngle = 270;        // ball is left  → use left offset
-    } else {
-        moveAngle = 90;         // ball is right → use right offset
+    if (homeDetected()){
+      if (diff > 0) {
+          moveAngle = 90;   // goal is left of ballBehind → move right
+      } else {
+          moveAngle = 270;  // goal is right of ballBehind → move left
+      }
     }
+    else
+    {
+      if (ballAngle < 180) {
+          moveAngle = 90;   // goal is left of ballBehind → move right
+      } else {
+          moveAngle = 270;  // goal is right of ballBehind → move left
+      }
+    }
+
 
     /* --- 3. Decide stripe orientation with hysteresis -------- */
     static int stripeForward = 1;          // remember last state
