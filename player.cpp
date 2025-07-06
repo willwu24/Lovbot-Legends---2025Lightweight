@@ -24,7 +24,7 @@ void player() {
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    displayUpdate();
+    // displayUpdate();
     getCameraData();
     processSensors();
     // processDFUltraTrig();
@@ -48,6 +48,7 @@ void player() {
     // === Actuation ===
 
     move();
+    // setMotors(20,20,20,20);
 
     // === Debugging ===
     // Serial.print(getSendArr(0));

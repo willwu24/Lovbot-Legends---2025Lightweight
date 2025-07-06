@@ -48,10 +48,13 @@ void displayUpdate()
   bool b2=buttonPressed(4);   // -- now “next”
 
   // if(b0 && !pB0) side = (side==BLUE)?YELLOW:BLUE;
-  if (b0 && !pB0){
+  if (page == 0 && b0 && !pB0){
     int current = getAttackMode();
     setAttackMode(current==BLUE?YELLOW:BLUE);
-    
+  }
+  if (page == 1 && b0 && !pB0) {
+    int current = getRobotRole();
+    setRobotRole(current==OFFENSE?DEFENSE:OFFENSE);  // toggle between 1 (offense) and 0 (defense)
   }
 
   if(b1 && !pB1) page = (page+4)%5;    //  –1  (left)

@@ -14,7 +14,7 @@ int dirDiff = maxDir - minDir;
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
 double speedKp=1.1, speedKi=0.000, speedKd=0.000;// 0.74
-double dirKp=0.24, dirKi=0.00, dirKd=0.07;//0.01, 0.3, 0.004,                  0.24
+double dirKp=0.27, dirKi=0.00, dirKd=0.08;//0.01, 0.3, 0.004,                  0.24
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
