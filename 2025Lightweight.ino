@@ -28,7 +28,7 @@ void setup() {
   setLEDState(4,1);
 
   Serial.println("Running basic setup...");
-  // setBotNum(0);
+  // setBotNum(1);
   setupMotors();
 
   Serial.println("Setting up sensors...");
@@ -40,7 +40,7 @@ void setup() {
   initSensors();
   eyeSetup();
   setUpBallPID();
-  displaySetup();
+  // displaySetup();
 
   Serial.println("Finished setup.");
 }

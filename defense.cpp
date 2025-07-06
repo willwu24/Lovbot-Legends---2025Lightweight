@@ -35,7 +35,7 @@ void defenseMain(){
     int tempCorner = (getDefenseDir() + getCompass())%360;
     if (getEyeValue() < 12){
       whiteMove(getHomeDir());
-      setSpeed(abs(getAngleDif(180,getHomeAngle())) * 0.5);
+      setSpeed(abs(getAngleDif(180,getHomeAngle())) * 1.0);
     }
     else if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
     {
@@ -113,10 +113,10 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   // defenseTuning = map(defenseTuning, 0.2,1.0,0.2,1.0);
 
   if (getEyeAngle() > 180){
-    cornerRatio = (270 - tempCorner) / 25.0;
+    cornerRatio = (270 - tempCorner) / 30.0;
   }
   else{
-    cornerRatio = (tempCorner - 90) / 25.0;
+    cornerRatio = (tempCorner - 90) / 30.0;
   }
   cornerRatio = constrain(cornerRatio, 0.0, 1.0);
   cornerRatio = 1.0-cornerRatio;
@@ -132,7 +132,7 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   // angleRatio = constrain(angleRatio, 0.0,0.6);
   // angleRatio = 1.0 - (exp(2.0 * (1.0 - angleRatio)) - 1.0) / (exp(2.0) - 1.0);   // high slope near 0, flat near 1
   // angleRatio = 1.0 - angleRatio;
-  angleRatio = constrain(angleRatio, 0.35,1.0);
+  angleRatio = constrain(angleRatio, 0.0,1.0);
 
 
   // double distRatio = getEyeValue()/200.0;
@@ -143,7 +143,9 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   }
   else
   {
-    setSpeed(angleRatio*cornerRatio*100);
+    double finalDefenseSpeed = angleRatio*cornerRatio*100.0;
+    finalDefenseSpeed = constrain(finalDefenseSpeed,15,80);
+    setSpeed(finalDefenseSpeed);
   }
 
   Serial.print(angleRatio);

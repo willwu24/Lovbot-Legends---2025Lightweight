@@ -11,7 +11,7 @@ void setupVariables(){
     }
   }
   else{//robert bot
-    int new_motor_dir[5] = {0,1,-1,-1,-1};
+    int new_motor_dir[5] = {0,-1,-1,-1,-1};
     for(int i = 0; i<n; i++){
       motor_dir[i] = new_motor_dir[i];
     }
