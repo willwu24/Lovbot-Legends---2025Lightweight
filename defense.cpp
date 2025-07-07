@@ -3,18 +3,51 @@
 int lastWhiteDir = 180;
 int lastDefenseWhiteTime = 0;
 int ballTimer = 0;
+int lastGoalAngle = -1;
+
+bool gettingBall = false;
+long firstGettingBall = -1;
+long firstBallFront = -1;
 
 double finalHeading;
 
 void defenseMain(){
   // transmit(2);
+  if(homeDetected()){
+    lastGoalAngle = getHomeAngle();
+  }
   setAngleThres(20);
-  if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1500){
+  if(hasBall()){
+    resetVariables();
+    setDir(0);
+    setSpeed(90);
+    if(getUltraFront()>80){
+      resetVariables();
+    }
+  }
+  else if(gettingBall){
+    if(firstGettingBall==-1){
+      firstGettingBall = millis();
+    }
+    else if(millis()-firstGettingBall>5||getUltraBackSmooth()>150){//went for too long, go back now
+      resetVariables();
+    }
+    else if(whiteDetected()&&millis()-firstGettingBall>300){//hit white line, go back
+      resetVariables();
+    }
+    else{
+      goToBallPID();
+      setSpeed(90);
+    }
+  }
+  else if (!whiteDetected() && millis() - lastDefenseWhiteTime < 1500){
+    resetVariables();
     setSpeed(40);
     setDir(lastWhiteDir);
   }
   else if (!whiteDetected()){
-    if (lastWhiteDir < 90 || lastWhiteDir > 270){
+    resetVariables();
+    if (lastWhiteDir < 80 || lastWhiteDir > 280){
       setDir(0);
       setTarget(0);
       setSpeed(40);
@@ -32,7 +65,33 @@ void defenseMain(){
   }
   else
   {
+    if((getEyeAngle()<=60||getEyeAngle()>=300)&&getEyeValue()>250){
+      if(firstBallFront==-1){
+        firstBallFront = millis();
+      }
+      else if(millis()-firstBallFront>3000){
+        gettingBall = true;
+      }
+    }
+    else{
+      resetVariables();
+    }
     int tempCorner = (getDefenseDir() + getCompass())%360;
+    // if(!homeDetected()){
+    //   setSpeed(30);
+    //   if(lastGoalAngle<180){
+    //     setDir(45);
+    //     if(getUltraRight()>100){
+    //       setDir(0);
+    //     }
+    //   }
+    //   else{
+    //     setDir(315);
+    //     if(getUltraLeft()>100){
+    //       setDir(0);
+    //     }
+    //   }
+    // }
     if (getEyeValue() < 12){
       whiteMove(getHomeDir());
       setSpeed(abs(getAngleDif(180,getHomeAngle())) * 1.0);
@@ -79,7 +138,7 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
 
   defenseTuning = 1.0 - defenseTuning;
   defenseTuning = constrain(defenseTuning, 0.1, 1.0);
-  defenseTuning = map(defenseTuning, 0.10,1.0,0.10,1.5);
+  defenseTuning = map(defenseTuning, 0.10,1.0,0.10,2.0);
 
   double wx = defenseTuning * mag * sin(toRadian(wlAngle)); // X: East+
   double wy = defenseTuning * mag * cos(toRadian(wlAngle)); // Y: North+
@@ -136,7 +195,7 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
 
 
   // double distRatio = getEyeValue()/200.0;
-  // distRatio = constrain(distRatio,0.8,1.0);
+  // distRatio = constrain(distRatio,0.8,1.0);s
   if ((tempCorner > 160 && tempCorner < 190) || (tempCorner < 200 && tempCorner > 170))
   {
     setSpeed(30);
@@ -144,13 +203,13 @@ void whiteMove(int dir)                       // dir = 90 or 270 (robot frame)
   else
   {
     double finalDefenseSpeed = angleRatio*cornerRatio*100.0;
-    finalDefenseSpeed = constrain(finalDefenseSpeed,15,80);
+    finalDefenseSpeed = constrain(finalDefenseSpeed,25,90);
     setSpeed(finalDefenseSpeed);
   }
 
-  Serial.print(angleRatio);
-  Serial.print(" ");
-  Serial.println(getSpeed());
+  // Serial.print(angleRatio);
+  // Serial.print(" ");
+  // Serial.println(getSpeed());
 }
 
 bool isCorner(int angle, int CORNER_TH)
@@ -179,11 +238,23 @@ int getDefenseDir()
 
     // Step 2: Choose ±90° offset based on which side of the goal-to-ball line you're on
     int ballBehind = (ballAngle + 180) % 360;
+
     int diff = getAngleDif(getHomeAngle(), ballBehind);  // signed angle from goal to point behind ball
 
+    int backWhite = (getWhiteAngle()+getCompass())%360;
+    if(abs(getAngleDif(backWhite,lastGoalAngle))>abs(getAngleDif(backWhite,(lastGoalAngle+180)%360))){
+      backWhite=(whiteDir+180)%360;
+    }
+    int whiteDiff = ((getEyeAngle()+getCompass())%360-(backWhite+180)%360+360)%360;
     int moveAngle;
+    Serial.print(" | ");
+    Serial.print(backWhite);
+    Serial.print(" | ");
+    Serial.print(getAngleDif((whiteDir+180)%360, ballBehind));
+    Serial.print("whiteDiff: ");
+    Serial.println(whiteDiff);
     if (homeDetected()){
-      if (diff > 0) {
+      if (whiteDiff < 180) {
           moveAngle = 90;   // goal is left of ballBehind → move right
       } else {
           moveAngle = 270;  // goal is right of ballBehind → move left
@@ -256,5 +327,11 @@ int getHomeDir(){
     defenseDir = (defenseDir + 180) % 360;
 
     return defenseDir;                     // 0–359°
+}
+
+void resetVariables(){
+  gettingBall = false;
+  firstGettingBall = -1;
+  firstBallFront = -1;
 }
 

@@ -19,8 +19,8 @@ int lastAround = 0;
 
 static unsigned long timer = 0;
 
-const int frontStart = 200, frontStop = 40, frontReverse = 0;
-const int backStart = 220, backStop = 90, backReverse = 0;
+const int frontStart = 160, frontStop = 40, frontReverse = 0;
+const int backStart = 140, backStop = 90, backReverse = 0;
 const int leftStart = 180, leftStop = 50, leftReverse = 0;
 const int rightStart = 180, rightStop = 50, rightReverse = 0;
 
@@ -80,7 +80,7 @@ void offenseMain() {
     }
     if(hasBall()){
       lastTargetSet = millis();
-      if (millis() - lastAround > 100){
+      if (millis() - lastAround > 200){
         kick();
       }
       goToBallPID();

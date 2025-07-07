@@ -51,8 +51,15 @@ void player() {
     // setMotors(20,20,20,20);
 
     // === Debugging ===
-    // Serial.print(getSendArr(0));
-    // Serial.print(' ');
+    // Serial.print(" Dir: ");
+    // Serial.print(getDir());
+    // Serial.print(" Speed: ");
+    // Serial.print(getSpeed());
+    // Serial.print(" Goal Angle: ");
+    // Serial.print(getHomeAngle());
+    // Serial.print(" Back: ");
+    // Serial.println(getUltraBackSmooth());
+
     // Serial.println(getReceiveArr(0));
     // Additional debug (uncomment to use):
 
