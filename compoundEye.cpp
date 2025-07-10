@@ -35,16 +35,16 @@ int getEyeAngle() {
   int port = getEyePort();
   int degree = port * (360.0 / eyeNum);
 
-  int frontAngle = analogRead(A3);  // Front IR sensor
-  if (frontAngle > 60 && frontAngle < 180) {
-    if (frontAngle < 100) {
-      degree = 10;
-    } else if (frontAngle < 130) {
-      degree = 0;
-    } else {
-      degree = 350;
-    }
-  }
+  // int frontAngle = analogRead(A3);  // Front IR sensor
+  // if (frontAngle > 60 && frontAngle < 180) {
+  //   if (frontAngle < 100) {
+  //     degree = 10;
+  //   } else if (frontAngle < 130) {
+  //     degree = 0;
+  //   } else {
+  //     degree = 350;
+  //   }
+  // }
 
   return degree;
 }

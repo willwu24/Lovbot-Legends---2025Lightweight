@@ -40,7 +40,7 @@ void setup() {
   initSensors();
   eyeSetup();
   setUpBallPID();
-  // displaySetup();
+  displaySetup();
 
   Serial.println("Finished setup.");
 }
