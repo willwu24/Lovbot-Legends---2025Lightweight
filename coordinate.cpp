@@ -6,10 +6,10 @@ void getCoordinate() {
   long acceptedInterval = 100;
   posInfo returnPosition;
 
-  int left  = getUltraLeft();
-  int right = getUltraRight();
-  int back  = getUltraBack();
-  int front = getUltraFront();
+  int left  = getUltraLeftSmooth();
+  int right = getUltraRightSmooth();
+  int back  = getUltraBackSmooth();
+  int front = getUltraFrontSmooth();
 
   posInfo rawPosition = findCO(front, right, back, left);
 
