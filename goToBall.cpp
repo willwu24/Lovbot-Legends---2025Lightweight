@@ -14,7 +14,7 @@ int dirDiff = maxDir - minDir;
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
 double speedKp=1.1, speedKi=0.000, speedKd=0.000;// 0.74
-double dirKp=0.27, dirKi=0.00, dirKd=0.08;//0.01, 0.3, 0.004,                  0.24
+double dirKp=0.21, dirKi=0.00, dirKd=0.02;//0.01, 0.3, 0.004,                  0.24
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
@@ -79,6 +79,10 @@ void goToBallPID(){
   }
 
   ballAngleRatio = constrain(ballAngleRatio,0.0,1.0);
+  double k = 4.0; // Tuning constant. Higher = steeper curve near 0
+  ballAngleRatio = 1.0 - exp(-k * ballAngleRatio);
+
+  Serial.println(ballAngleRatio);
 
 
   double offset = (dirDiff) * (distanceRatio/100.0) * (ballAngleRatio);
@@ -89,7 +93,7 @@ void goToBallPID(){
 
   double finalDirection = ballDir + offset;
   setDir(finalDirection);
-  setSpeed(90);
+  setSpeed(98);
 
   if (ballDist < 12) { // Adjust condition for reset based on new range
       resetBallPID();

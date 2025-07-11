@@ -56,6 +56,9 @@ void displayUpdate()
     int current = getRobotRole();
     setRobotRole(current==OFFENSE?DEFENSE:OFFENSE);  // toggle between 1 (offense) and 0 (defense)
   }
+  if (page == 2 && b0 && !pB0){
+    transmit(4);
+  }
 
   if(b1 && !pB1) page = (page+4)%5;    //  –1  (left)
   if(b2 && !pB2) page = (page+1)%5;    //  +1  (right)

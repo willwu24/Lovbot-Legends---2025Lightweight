@@ -19,10 +19,10 @@ int lastAround = 0;
 
 static unsigned long timer = 0;
 
-const int frontStart = 200, frontStop = 40, frontReverse = 0;
-const int backStart = 220, backStop = 90, backReverse = 0;
-const int leftStart = 180, leftStop = 50, leftReverse = 0;
-const int rightStart = 180, rightStop = 50, rightReverse = 0;
+const int frontStart = 140, frontStop = 30, frontReverse = 0;
+const int backStart = 150, backStop = 94, backReverse = 0;
+const int leftStart = 140, leftStop = 58, leftReverse = 0;
+const int rightStart = 140, rightStop = 58, rightReverse = 0;
 
 bool turnSet = false;
 
@@ -68,15 +68,15 @@ void offenseMain() {
   // === Default Behavior ===
   else {
     if(inCorner()){
-      // if (blockGoalieSide == 1){
-      //   transmit(2); //left
-      //   setRobotRole(DEFENSE);
-      // }
-      // else
-      // {
-      //   transmit(2);
-      //   setRobotRole(DEFENSE);
-      // }
+      if (blockGoalieSide == 1){
+        transmit(2); //left
+        // setRobotRole(DEFENSE);
+      }
+      else
+      {
+        transmit(3);
+        // setRobotRole(DEFENSE);
+      }
     }
     if(hasBall()){
       lastTargetSet = millis();

@@ -54,7 +54,7 @@ static posInfo currPosition;
 #define BACK    2
 #define LEFT    3
 
-#define MAX_SPEED  120
+#define MAX_SPEED  99
 #define STOP       360   // Representation of stop in move()
 #define BLOCKED    361   // Representation of blocked in move()
 

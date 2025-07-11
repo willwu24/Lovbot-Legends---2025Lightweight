@@ -24,7 +24,7 @@ void player() {
   while (1) {
     // === Core Sensor & Input Processing ===
     updateButton();
-    // displayUpdate();
+    displayUpdate();
     getCameraData();
     processSensors();
     // processDFUltraTrig();
@@ -44,17 +44,19 @@ void player() {
       processWhiteAngle();
       defenseMain();
     }
+
     //goToCoordinate(0, 0);
     // === Actuation ===
 
     move();
-    // setMotors(20,20,20,20);
+    // setMotors(99,99,99,99);
 
     // === Debugging ===
     // Serial.print(getSendArr(0));
     // Serial.print(' ');
     // Serial.println(getReceiveArr(0));
     // Additional debug (uncomment to use):
+    // Serial.println(getUltraBackSmooth());
 
   }
 }
