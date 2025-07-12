@@ -29,5 +29,9 @@ void blockGoalie1();
 
 int getHomeDir();
 
+void resetVariables();
+
+int getWhiteMoveAngle(int);
+
 
 #endif  // DEFENSE_H

@@ -19,10 +19,10 @@ int lastAround = 0;
 
 static unsigned long timer = 0;
 
-const int frontStart = 140, frontStop = 30, frontReverse = 0;
-const int backStart = 150, backStop = 94, backReverse = 0;
-const int leftStart = 140, leftStop = 58, leftReverse = 0;
-const int rightStart = 140, rightStop = 58, rightReverse = 0;
+const int frontStart = 130, frontStop = 30, frontReverse = 0;
+const int backStart = 160, backStop = 94, backReverse = 0;
+const int leftStart = 150, leftStop = 58, leftReverse = 0;
+const int rightStart = 150, rightStop = 58, rightReverse = 0;
 
 bool turnSet = false;
 
@@ -67,20 +67,20 @@ void offenseMain() {
 
   // === Default Behavior ===
   else {
-    if(inCorner()){
-      if (blockGoalieSide == 1){
-        transmit(2); //left
-        // setRobotRole(DEFENSE);
-      }
-      else
-      {
-        transmit(3);
-        // setRobotRole(DEFENSE);
-      }
-    }
+    // if(inCorner()){
+    //   if (blockGoalieSide == 1){
+    //     transmit(2); //left
+    //     // setRobotRole(DEFENSE);
+    //   }
+    //   else
+    //   {
+    //     transmit(3);
+    //     // setRobotRole(DEFENSE);
+    //   }
+    // }
     if(hasBall()){
       lastTargetSet = millis();
-      if (millis() - lastAround > 100){
+      if (millis() - lastAround > 150){
         kick();
       }
       goToBallPID();

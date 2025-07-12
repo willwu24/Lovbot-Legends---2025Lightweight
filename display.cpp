@@ -144,7 +144,7 @@ static void drawHome()
  * =========================================================== */
 static void drawUltra()
 {
-  int usFront=getUltraFront(), usBack=getUltraBack(), usLeft=getUltraLeft(), usRight=getUltraRight();
+  int usFront=getUltraFrontSmooth(), usBack=getUltraBackSmooth(), usLeft=getUltraLeftSmooth(), usRight=getUltraRightSmooth();
     /* frame (same size as before) */
     oled.drawRoundRect(0, 8, 128, 56, 4, SSD1306_WHITE);
 

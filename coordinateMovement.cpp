@@ -1,8 +1,8 @@
 #include "coordinateMovement.h"
 
 // Speed control
-int minSpeed = 15;
-int maxSpeed = 40;
+int minSpeed = 40;
+int maxSpeed = 85;
 
 // Parking parameters
 int parkThresholdDist = 40;
@@ -52,6 +52,7 @@ void goToCoordinate(int tarX, int tarY){
   setTarget(0);
   setDir(currMove.dir);
   setSpeed(speedCalculator(currMove.dist));
+  Serial.print(currMove.dist);
 }
 
 bool isParked(int dist) {
@@ -68,7 +69,8 @@ bool isParked(int dist) {
 }
 
 int speedCalculator(int dist) {
-  int speed = minSpeed + (maxSpeed - minSpeed) * abs(dist) * 0.005;
+  // int speed = minSpeed + (maxSpeed - minSpeed) * abs(dist) * 0.005;
+  int speed = map(speed, 0,200, minSpeed,maxSpeed);
   return constrain(speed, minSpeed, maxSpeed);
 }
 

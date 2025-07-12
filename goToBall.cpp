@@ -14,7 +14,7 @@ int dirDiff = maxDir - minDir;
 
 double ballClosest, ballFarthest, ballDist, speedRatio, distanceRatio;
 double speedKp=1.1, speedKi=0.000, speedKd=0.000;// 0.74
-double dirKp=0.21, dirKi=0.00, dirKd=0.02;//0.01, 0.3, 0.004,                  0.24
+double dirKp=0.21, dirKi=0.00, dirKd=0.03;//0.01, 0.3, 0.004,                  0.24
 
 double PIDMinimum = 0;
 double PIDMaximum = 100;
@@ -93,7 +93,7 @@ void goToBallPID(){
 
   double finalDirection = ballDir + offset;
   setDir(finalDirection);
-  setSpeed(98);
+  setSpeed(94);
 
   if (ballDist < 12) { // Adjust condition for reset based on new range
       resetBallPID();

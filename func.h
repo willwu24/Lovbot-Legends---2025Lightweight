@@ -58,8 +58,8 @@ static posInfo currPosition;
 #define STOP       360   // Representation of stop in move()
 #define BLOCKED    361   // Representation of blocked in move()
 
-#define H_SIZE 450  // Horizontal field size (new robot)
-#define V_SIZE 550  // Vertical field size
+#define H_SIZE 300  // Horizontal field size (new robot)
+#define V_SIZE 300  // Vertical field size
 
 const int toleranceH = 100;
 const int toleranceV = 120;//40

@@ -2,7 +2,7 @@
 
 // PID variables
 
-double motorCorrectionKp = 0.42, motorCorrectionKi = 0.00, motorCorrectionKd = 0.03;
+double motorCorrectionKp = 0.27, motorCorrectionKi = 0.00, motorCorrectionKd = 0.02;
 double motorTurningKp = 0.23, motorTurningKi = 0.00, motorTurningKd = 0.00;
 double motorSetpoint, motorInput, motorCorrectionOutput, motorTurningOutput;
 
